@@ -13,7 +13,12 @@
           @click="currentTab = 'posts'">
           📝 Publicaciones
         </button>
+        
+        <button @click="logout" class="logout-btn">
+          🔴 Cerrar Sesión
+        </button>
       </nav>
+      
       <a href="/" class="back-link">← Ver Web</a>
     </aside>
 
@@ -48,22 +53,22 @@
           
           <div class="file-upload-group">
             <label class="file-label">
-              📸 Seleccionar Imagen
+              📸 Subir Imagen
               <input type="file" @change="handleFileUpload" class="file-input" accept="image/*">
             </label>
-            <span v-if="previewImage" class="file-name">✅ Imagen lista para subir</span>
+            <span v-if="previewImage" class="file-name">Imagen lista</span>
           </div>
 
-          <input v-model="newPost.excerpt" placeholder="Resumen corto (se ve en la tarjeta)" class="input">
+          <input v-model="newPost.excerpt" placeholder="Resumen corto" class="input">
           
           <div class="checkbox-group">
             <label>
               <input type="checkbox" v-model="newPost.is_carousel">
-              🌟 Destacar en el Carrusel Principal (Inicio)
+              🌟 Destacar en Carrusel
             </label>
           </div>
 
-          <textarea v-model="newPost.content" placeholder="Escribe aquí todo el contenido..." class="input area-large"></textarea>
+          <textarea v-model="newPost.content" placeholder="Contenido..." class="input area-large"></textarea>
           
           <button @click="createPost" class="btn btn-success">Publicar Artículo</button>
         </div>
@@ -73,10 +78,10 @@
         <h3>Historial de Publicaciones</h3>
         <div class="posts-list">
           <div v-for="post in posts" :key="post.id" class="post-item">
-            <div class="post-info">
+            <div>
               <strong>{{ post.title }}</strong>
               <span class="badge">{{ post.category }}</span>
-              <span v-if="post.is_carousel" class="badge-star">🌟 Carrusel</span>
+              <span v-if="post.is_carousel" class="badge">🌟</span>
             </div>
             <button @click="deletePost(post.id)" class="btn-delete">Eliminar</button>
           </div>
@@ -91,31 +96,27 @@
 import { ref } from 'vue';
 import axios from 'axios';
 
-// Recibimos los datos que envía el controlador
 const props = defineProps({
-  initialData: Object // Aquí viene 'setting' y 'posts' juntos
+  initialData: Object 
 });
 
-// Datos Reactivos
 const currentTab = ref('posts'); 
 const settings = ref(props.initialData.setting || { title: '', hero_text: '' });
 const posts = ref(props.initialData.posts || []);
 
-// Objeto para el nuevo post
 const newPost = ref({
   title: '',
   category: '',
   excerpt: '',
   content: '',
   is_carousel: false,
-  image_file: null // Aquí guardaremos el archivo real
+  image_file: null
 });
 
 const previewImage = ref(false);
 
 // --- FUNCIONES ---
 
-// 1. Manejar la selección del archivo
 const handleFileUpload = (event) => {
   const file = event.target.files[0];
   if (file) {
@@ -124,7 +125,7 @@ const handleFileUpload = (event) => {
   }
 };
 
-// 2. Guardar Configuración General
+// 1. Guardar Configuración
 const saveSettings = async () => {
   try {
     await axios.post('/admin/settings', settings.value);
@@ -134,17 +135,15 @@ const saveSettings = async () => {
   }
 };
 
-// 3. Crear Post (Con imagen real)
+// 2. Crear Post
 const createPost = async () => {
-  if (!newPost.value.title || !newPost.value.category) return alert('Faltan datos obligatorios');
+  if (!newPost.value.title || !newPost.value.category) return alert('Faltan datos');
 
-  // Usamos FormData para poder enviar archivos
   let formData = new FormData();
   formData.append('title', newPost.value.title);
   formData.append('category', newPost.value.category);
   formData.append('excerpt', newPost.value.excerpt || '');
   formData.append('content', newPost.value.content || '');
-  // Los booleanos a veces se envían como texto en FormData, es mejor asegurarnos
   formData.append('is_carousel', newPost.value.is_carousel ? 'true' : 'false');
   
   if (newPost.value.image_file) {
@@ -153,22 +152,17 @@ const createPost = async () => {
 
   try {
     const response = await axios.post('/admin/posts', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
+        headers: { 'Content-Type': 'multipart/form-data' }
     });
-    
-    alert('Publicado con éxito');
-    // Recargamos para ver la imagen y el post nuevo inmediatamente
+    // Recargar para ver imagen y cambios
     window.location.reload();
-
   } catch (e) {
     console.error(e);
-    alert('Error al publicar. Revisa la consola.');
+    alert('Error al publicar');
   }
 };
 
-// 4. Eliminar Post
+// 3. Eliminar Post
 const deletePost = async (id) => {
   if (!confirm('¿Seguro que quieres borrar esto?')) return;
 
@@ -179,10 +173,20 @@ const deletePost = async (id) => {
     alert('Error al eliminar');
   }
 };
+
+// 4. NUEVO: Función Cerrar Sesión (Pegado aquí)
+const logout = async () => {
+  try {
+    await axios.post('/logout');
+    window.location.href = '/login'; // Redirigir al login
+  } catch (e) {
+    alert('Error al salir');
+  }
+};
 </script>
 
 <style scoped>
-/* Estilos estilo Dashboard Moderno */
+/* Estilos Dashboard */
 .admin-layout {
   display: flex;
   min-height: 100vh;
@@ -190,7 +194,6 @@ const deletePost = async (id) => {
   background: #f4f6f8;
 }
 
-/* Sidebar */
 .sidebar {
   width: 250px;
   background: #1e293b;
@@ -217,6 +220,18 @@ const deletePost = async (id) => {
   background: #334155;
   color: white;
 }
+
+/* Estilo especial para botón salir */
+.logout-btn {
+  margin-top: 20px;
+  color: #f87171 !important; /* Rojo suave */
+  border: 1px solid rgba(248, 113, 113, 0.2) !important;
+}
+.logout-btn:hover {
+  background: rgba(239, 68, 68, 0.1) !important;
+  color: #ef4444 !important;
+}
+
 .back-link {
   margin-top: auto;
   color: #94a3b8;
@@ -225,7 +240,6 @@ const deletePost = async (id) => {
   text-align: center;
 }
 
-/* Content */
 .content {
   flex: 1;
   padding: 40px;
@@ -270,13 +284,6 @@ const deletePost = async (id) => {
 }
 
 /* Lista */
-.post-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 0;
-  border-bottom: 1px solid #f1f5f9;
-}
 .badge {
   background: #e2e8f0;
   padding: 2px 8px;
@@ -286,14 +293,12 @@ const deletePost = async (id) => {
   color: #475569;
   text-transform: uppercase;
 }
-.badge-star {
-  background: #fffbeb;
-  color: #b45309;
-  padding: 2px 8px;
-  border-radius: 10px;
-  font-size: 0.8rem;
-  margin-left: 5px;
-  border: 1px solid #fcd34d;
+.post-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 1px solid #f1f5f9;
 }
 
 /* Inputs de Archivo y Checkbox */

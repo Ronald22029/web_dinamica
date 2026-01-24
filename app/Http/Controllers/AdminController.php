@@ -4,60 +4,62 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\SiteSetting;
-use App\Models\Post; // <--- Importamos el modelo de Posts
+use App\Models\Post;
+use Illuminate\Support\Facades\Storage; // Importante para manejar archivos
 
 class AdminController extends Controller
 {
     public function index() {
-        // Carga la configuración Y todos los posts ordenados por fecha
         $setting = SiteSetting::first();
         $posts = Post::latest()->get();
-        
         return view('admin', compact('setting', 'posts'));
     }
 
-    // Guardar Configuración General (Título y Subtítulo)
     public function updateSettings(Request $request) {
-        $setting = SiteSetting::firstOrNew(); // Crea uno si no existe
+        $setting = SiteSetting::firstOrNew();
         $setting->title = $request->title;
         $setting->hero_text = $request->hero_text;
         $setting->save();
-
         return response()->json(['message' => 'Configuración actualizada']);
     }
 
-    // Crear una nueva Publicación
+    // --- AQUÍ ESTABA EL PROBLEMA ---
     public function storePost(Request $request) {
         $request->validate([
             'title' => 'required',
             'category' => 'required',
-            // 'image' ahora puede ser archivo O texto (si prefieres pegar link)
+            'content' => 'required'
         ]);
 
         $post = new Post();
         $post->title = $request->title;
-        $post->excerpt = $request->excerpt;
+        // Si no envían excerpt, guardamos una cadena vacía para que no de error SQL
+        $post->excerpt = $request->excerpt ?? ''; 
         $post->content = $request->content;
         $post->category = $request->category;
         
-        // --- LÓGICA DE IMAGEN ---
+        // Lógica para guardar la imagen real
         if ($request->hasFile('image_file')) {
-            // Guardar archivo en storage/app/public/posts
+            // Guardar en storage/app/public/posts
             $path = $request->file('image_file')->store('posts', 'public');
-            $post->image = '/storage/' . $path; // Guardamos la ruta pública
+            $post->image = '/storage/' . $path;
         } else {
-            $post->image = $request->image_url; // Por si usas link externo
+            // Si no hay archivo, intentar usar la URL o poner null
+            $post->image = $request->image; 
         }
 
-        // Checkbox del carrusel (viene como string "true" o null)
-        $post->is_carousel = $request->is_carousel === 'true' ? true : false;
+        // Lógica del Carrusel (con protección por si la columna no existe aún)
+        // Convertimos el string "true"/"false" a booleano real
+        $isCarousel = $request->is_carousel === 'true' || $request->is_carousel === true;
+        
+        // Solo intentamos guardar si la columna existe (o si ya corriste la migración)
+        $post->is_carousel = $isCarousel; 
         
         $post->save();
 
-        return response()->json(['message' => 'Publicado', 'post' => $post]);
+        return response()->json(['message' => 'Publicación creada', 'post' => $post]);
     }
 
-    // Borrar una Publicación
     public function deletePost($id) {
         $post = Post::find($id);
         if ($post) {

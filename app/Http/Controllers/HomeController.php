@@ -12,7 +12,7 @@ class HomeController extends Controller
     {
         // 1. Configuración General
         $setting = SiteSetting::first();
-        $siteTitle = $setting ? $setting->title : 'Ronald.Dev';
+        $siteTitle = $setting ? $setting->title : 'Web Viral';
         $heroText = $setting ? $setting->hero_text : 'Bienvenido a mi portafolio.';
 
         // 2. Filtros y Metadatos
@@ -25,11 +25,10 @@ class HomeController extends Controller
             $heroText = "Explora los últimos artículos sobre " . ucfirst($category);
         }
 
-        // 3. Obtener posts normales y Carrusel
+        // 3. Obtener posts
         $posts = $query->latest()->get();
-        // Intentamos obtener posts marcados para carrusel, si la columna existe
-        // Si no has corrido la migración del paso anterior, esto podría fallar, 
-        // así que por seguridad traemos los últimos 5 si falla.
+        
+        // Intentar obtener posts del carrusel (si falla, devuelve vacío)
         try {
             $carouselPosts = Post::where('is_carousel', true)->latest()->take(5)->get();
         } catch (\Exception $e) {

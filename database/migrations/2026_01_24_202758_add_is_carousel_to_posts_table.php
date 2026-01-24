@@ -9,10 +9,10 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-   public function up(): void
+public function up(): void
 {
     Schema::table('posts', function (Blueprint $table) {
-        $table->boolean('is_carousel')->default(false); // Nuevo campo
+        $table->boolean('is_carousel')->default(false); // <--- Agregamos esto
     });
 }
 
