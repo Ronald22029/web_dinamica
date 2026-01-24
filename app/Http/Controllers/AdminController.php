@@ -28,22 +28,33 @@ class AdminController extends Controller
 
     // Crear una nueva Publicación
     public function storePost(Request $request) {
-        // Validamos que lleguen los datos correctos
         $request->validate([
             'title' => 'required',
             'category' => 'required',
-            'content' => 'required'
+            // 'image' ahora puede ser archivo O texto (si prefieres pegar link)
         ]);
 
         $post = new Post();
         $post->title = $request->title;
-        $post->excerpt = $request->excerpt; // Resumen
-        $post->content = $request->content; // Contenido completo
+        $post->excerpt = $request->excerpt;
+        $post->content = $request->content;
         $post->category = $request->category;
-        $post->image = $request->image; // URL de la imagen
+        
+        // --- LÓGICA DE IMAGEN ---
+        if ($request->hasFile('image_file')) {
+            // Guardar archivo en storage/app/public/posts
+            $path = $request->file('image_file')->store('posts', 'public');
+            $post->image = '/storage/' . $path; // Guardamos la ruta pública
+        } else {
+            $post->image = $request->image_url; // Por si usas link externo
+        }
+
+        // Checkbox del carrusel (viene como string "true" o null)
+        $post->is_carousel = $request->is_carousel === 'true' ? true : false;
+        
         $post->save();
 
-        return response()->json(['message' => 'Publicación creada', 'post' => $post]);
+        return response()->json(['message' => 'Publicado', 'post' => $post]);
     }
 
     // Borrar una Publicación

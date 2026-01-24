@@ -46,8 +46,23 @@
             </select>
           </div>
           
+          <div class="file-upload-group">
+            <label class="file-label">
+              📸 Seleccionar Imagen
+              <input type="file" @change="handleFileUpload" class="file-input" accept="image/*">
+            </label>
+            <span v-if="previewImage" class="file-name">✅ Imagen lista para subir</span>
+          </div>
+
           <input v-model="newPost.excerpt" placeholder="Resumen corto (se ve en la tarjeta)" class="input">
-          <input v-model="newPost.image" placeholder="URL de la imagen (ej: https://imgur.com/...)" class="input">
+          
+          <div class="checkbox-group">
+            <label>
+              <input type="checkbox" v-model="newPost.is_carousel">
+              🌟 Destacar en el Carrusel Principal (Inicio)
+            </label>
+          </div>
+
           <textarea v-model="newPost.content" placeholder="Escribe aquí todo el contenido..." class="input area-large"></textarea>
           
           <button @click="createPost" class="btn btn-success">Publicar Artículo</button>
@@ -58,9 +73,10 @@
         <h3>Historial de Publicaciones</h3>
         <div class="posts-list">
           <div v-for="post in posts" :key="post.id" class="post-item">
-            <div>
+            <div class="post-info">
               <strong>{{ post.title }}</strong>
               <span class="badge">{{ post.category }}</span>
+              <span v-if="post.is_carousel" class="badge-star">🌟 Carrusel</span>
             </div>
             <button @click="deletePost(post.id)" class="btn-delete">Eliminar</button>
           </div>
@@ -81,22 +97,34 @@ const props = defineProps({
 });
 
 // Datos Reactivos
-const currentTab = ref('posts'); // Pestaña activa por defecto
+const currentTab = ref('posts'); 
 const settings = ref(props.initialData.setting || { title: '', hero_text: '' });
 const posts = ref(props.initialData.posts || []);
 
-// Objeto vacío para el nuevo post
+// Objeto para el nuevo post
 const newPost = ref({
   title: '',
   category: '',
   excerpt: '',
   content: '',
-  image: ''
+  is_carousel: false,
+  image_file: null // Aquí guardaremos el archivo real
 });
+
+const previewImage = ref(false);
 
 // --- FUNCIONES ---
 
-// 1. Guardar Configuración
+// 1. Manejar la selección del archivo
+const handleFileUpload = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    newPost.value.image_file = file;
+    previewImage.value = true;
+  }
+};
+
+// 2. Guardar Configuración General
 const saveSettings = async () => {
   try {
     await axios.post('/admin/settings', settings.value);
@@ -106,30 +134,46 @@ const saveSettings = async () => {
   }
 };
 
-// 2. Crear Post
+// 3. Crear Post (Con imagen real)
 const createPost = async () => {
-  if (!newPost.value.title || !newPost.value.category) return alert('Faltan datos');
+  if (!newPost.value.title || !newPost.value.category) return alert('Faltan datos obligatorios');
+
+  // Usamos FormData para poder enviar archivos
+  let formData = new FormData();
+  formData.append('title', newPost.value.title);
+  formData.append('category', newPost.value.category);
+  formData.append('excerpt', newPost.value.excerpt || '');
+  formData.append('content', newPost.value.content || '');
+  // Los booleanos a veces se envían como texto en FormData, es mejor asegurarnos
+  formData.append('is_carousel', newPost.value.is_carousel ? 'true' : 'false');
+  
+  if (newPost.value.image_file) {
+    formData.append('image_file', newPost.value.image_file);
+  }
 
   try {
-    const response = await axios.post('/admin/posts', newPost.value);
-    // Agregamos el nuevo post a la lista visualmente (sin recargar)
-    posts.value.unshift(response.data.post);
-    // Limpiamos el formulario
-    newPost.value = { title: '', category: '', excerpt: '', content: '', image: '' };
+    const response = await axios.post('/admin/posts', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    
     alert('Publicado con éxito');
+    // Recargamos para ver la imagen y el post nuevo inmediatamente
+    window.location.reload();
+
   } catch (e) {
     console.error(e);
-    alert('Error al publicar');
+    alert('Error al publicar. Revisa la consola.');
   }
 };
 
-// 3. Eliminar Post
+// 4. Eliminar Post
 const deletePost = async (id) => {
   if (!confirm('¿Seguro que quieres borrar esto?')) return;
 
   try {
     await axios.delete(`/admin/posts/${id}`);
-    // Quitamos el post de la lista visualmente
     posts.value = posts.value.filter(post => post.id !== id);
   } catch (e) {
     alert('Error al eliminar');
@@ -226,6 +270,13 @@ const deletePost = async (id) => {
 }
 
 /* Lista */
+.post-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
 .badge {
   background: #e2e8f0;
   padding: 2px 8px;
@@ -235,11 +286,43 @@ const deletePost = async (id) => {
   color: #475569;
   text-transform: uppercase;
 }
-.post-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 0;
-  border-bottom: 1px solid #f1f5f9;
+.badge-star {
+  background: #fffbeb;
+  color: #b45309;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  margin-left: 5px;
+  border: 1px solid #fcd34d;
 }
+
+/* Inputs de Archivo y Checkbox */
+.file-upload-group {
+  margin: 15px 0;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.file-input { display: none; }
+.file-label {
+  background: #cbd5e1;
+  color: #334155;
+  padding: 8px 15px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 0.9rem;
+  transition: background 0.2s;
+}
+.file-label:hover { background: #94a3b8; color: white; }
+.file-name { color: #10b981; font-weight: bold; font-size: 0.9rem; }
+
+.checkbox-group {
+  margin: 15px 0;
+  font-weight: 600;
+  color: #334155;
+  display: flex;
+  align-items: center;
+}
+.checkbox-group input { margin-right: 10px; transform: scale(1.2); }
 </style>
