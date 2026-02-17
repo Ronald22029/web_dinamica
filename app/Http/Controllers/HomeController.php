@@ -12,7 +12,7 @@ class HomeController extends Controller
     {
         // 1. Configuración General
         $setting = SiteSetting::first();
-        $siteTitle = $setting ? $setting->title : 'Web Viral';
+        $siteTitle = $setting ? $setting->title : 'ELEDEN';
         $heroText = $setting ? $setting->hero_text : 'Bienvenido a mi portafolio.';
 
         // 2. Filtros y Metadatos
@@ -47,5 +47,19 @@ class HomeController extends Controller
         ];
 
         return view('welcome', compact('data'));
+    }
+    // AGREGA ESTA NUEVA FUNCIÓN
+    public function show($id)
+    {
+        $post = Post::findOrFail($id);
+        
+        // Configuramos los metadatos básicos para la vista
+        $data = [
+            'meta_title' => $post->title . ' - ELEDEN',
+            'meta_description' => $post->excerpt,
+            'post' => $post
+        ];
+
+        return view('post', compact('data'));
     }
 }

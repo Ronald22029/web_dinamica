@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Administrativo</title>
+    <title>{{ $data['meta_title'] }}</title>
+    <meta name="description" content="{{ $data['meta_description'] }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body style="background-color: #f3f4f6;">
+<body>
     <div id="app">
-        <admin-panel :initial-data="{{ json_encode(['setting' => $setting, 'posts' => $posts]) }}"></admin-panel>
+        <post-page :initial-data="{{ json_encode($data) }}"></post-page>
     </div>
 </body>
 </html>

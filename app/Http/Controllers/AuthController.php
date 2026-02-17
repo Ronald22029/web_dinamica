@@ -20,9 +20,10 @@ class AuthController extends Controller
         ]);
 
         if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-            return redirect()->intended('/admin');
-        }
+        $request->session()->regenerate();
+        // CAMBIO: Redirigir a la raíz '/' (que ahora es el panel admin)
+        return redirect('/'); 
+    }
 
         return back()->withErrors([
             'email' => 'Las credenciales no coinciden.',
