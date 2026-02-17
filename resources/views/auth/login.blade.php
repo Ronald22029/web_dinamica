@@ -7,90 +7,94 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
         
+        * { box-sizing: border-box; } /* Evita que los inputs se salgan del borde */
+
         body {
             margin: 0;
             padding: 0;
             font-family: 'Plus Jakarta Sans', sans-serif;
             background: #0f172a;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            overflow: hidden;
             position: relative;
+            overflow-x: hidden;
         }
 
-        /* Fondo Aurora Animado */
         .aurora-bg {
-            position: absolute;
-            top: -50%; left: -50%; width: 200%; height: 200%;
-            background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.4), transparent 50%),
-                        radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.4), transparent 40%);
-            animation: aurora 10s infinite alternate;
-            z-index: 0;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(59, 130, 246, 0.3), transparent 70%),
+                        radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.3), transparent 70%);
+            z-index: -1;
+            filter: blur(60px);
         }
-        @keyframes aurora { from { transform: rotate(0deg); } to { transform: rotate(10deg); } }
 
-        /* Tarjeta Glass */
         .login-card {
-            position: relative;
-            z-index: 10;
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
             padding: 40px;
-            border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 28px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
             width: 100%;
-            max-width: 400px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            max-width: 420px;
+            box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.7);
             text-align: center;
             color: white;
+            margin: 20px;
         }
 
-        h1 { margin-bottom: 10px; font-weight: 800; letter-spacing: -1px; }
-        p { color: #94a3b8; margin-bottom: 30px; font-size: 0.9rem; }
+        h1 { margin: 0 0 10px; font-weight: 800; font-size: 2rem; letter-spacing: -1.5px; background: linear-gradient(to right, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        p { color: #94a3b8; margin-bottom: 35px; font-size: 0.95rem; }
 
-        .input-group { margin-bottom: 20px; text-align: left; }
-        label { display: block; margin-bottom: 8px; font-size: 0.85rem; font-weight: 600; color: #cbd5e1; }
+        .input-group { margin-bottom: 22px; text-align: left; }
+        label { display: block; margin-bottom: 10px; font-size: 0.85rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; }
+        
         input {
             width: 100%;
-            padding: 12px;
-            border-radius: 10px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(0, 0, 0, 0.2);
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.05);
             color: white;
-            font-family: inherit;
-            box-sizing: border-box; /* Importante para que no se salga */
-            transition: 0.3s;
+            font-size: 1rem;
+            transition: all 0.3s ease;
         }
+        
         input:focus {
             outline: none;
             border-color: #3b82f6;
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
         }
 
         button {
             width: 100%;
-            padding: 14px;
-            border-radius: 10px;
+            padding: 16px;
+            border-radius: 12px;
             border: none;
             background: #3b82f6;
             color: white;
             font-weight: 700;
+            font-size: 1rem;
             cursor: pointer;
-            transition: 0.3s;
+            transition: all 0.3s;
             margin-top: 10px;
+            box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.4);
         }
-        button:hover { background: #2563eb; transform: translateY(-2px); }
+        
+        button:hover { background: #2563eb; transform: translateY(-2px); box-shadow: 0 15px 25px -5px rgba(59, 130, 246, 0.5); }
 
         .error {
-            background: rgba(239, 68, 68, 0.2);
+            background: rgba(239, 68, 68, 0.15);
             color: #fca5a5;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 25px;
             font-size: 0.85rem;
-            border: 1px solid rgba(239, 68, 68, 0.3);
+            border: 1px solid rgba(239, 68, 68, 0.2);
         }
     </style>
 </head>
@@ -99,7 +103,7 @@
     
     <div class="login-card">
         <h1>Ronald.Dev</h1>
-        <p>Acceso al Panel Administrativo</p>
+        <p>Panel Administrativo</p>
 
         @if ($errors->any())
             <div class="error">
@@ -110,8 +114,8 @@
         <form action="/login" method="POST">
             @csrf
             <div class="input-group">
-                <label>Correo Electrónico</label>
-                <input type="email" name="email" placeholder="admin@ronald.dev" required>
+                <label>Email</label>
+                <input type="email" name="email" placeholder="admin@ronald.dev" required value="{{ old('email') }}">
             </div>
 
             <div class="input-group">
@@ -119,7 +123,7 @@
                 <input type="password" name="password" placeholder="••••••••" required>
             </div>
 
-            <button type="submit">Ingresar al Sistema</button>
+            <button type="submit">Iniciar Sesión</button>
         </form>
     </div>
 </body>

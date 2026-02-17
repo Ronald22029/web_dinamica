@@ -4,7 +4,7 @@
     <nav class="navbar" :class="{ 'scrolled': isScrolled }">
       <div class="container nav-content">
         
-        <a href="/sitio" class="brand">
+        <a href="/" class="brand">
           <div class="logo-container">
             <img :src="'/images/logo.jpg'" alt="Logo Web Viral" class="nav-logo">
           </div>
@@ -12,10 +12,10 @@
         </a>
 
         <ul class="nav-links">
-          <li><a href="/sitio" :class="{ active: pageData.current_category === 'home' }">Inicio</a></li>
-          <li><a href="/sitio/categoria/eventos" :class="{ active: pageData.current_category === 'eventos' }">Eventos</a></li>
-          <li><a href="/sitio/categoria/tecnologia" :class="{ active: pageData.current_category === 'tecnologia' }">Tecnología</a></li>
-          <li><a href="/sitio/categoria/portafolio" :class="{ active: pageData.current_category === 'portafolio' }">Portafolio</a></li>
+          <li><a href="/" :class="{ active: pageData.current_category === 'home' }">Inicio</a></li>
+          <li><a href="/categoria/eventos" :class="{ active: pageData.current_category === 'eventos' }">Eventos</a></li>
+          <li><a href="/categoria/tecnologia" :class="{ active: pageData.current_category === 'tecnologia' }">Tecnología</a></li>
+          <li><a href="/categoria/portafolio" :class="{ active: pageData.current_category === 'portafolio' }">Portafolio</a></li>
         </ul>
 
       </div>
@@ -28,7 +28,7 @@
         <div class="carousel-track" :style="{ transform: `translateX(-${currentSlide * 100}%)` }">
           <div v-for="slide in pageData.carousel_posts" :key="slide.id" class="carousel-slide">
             
-            <a :href="'/sitio/post/' + slide.id" class="slide-link">
+            <a :href="'/post/' + slide.id" class="slide-link">
               
               <img :src="getThumbnail(slide)" class="slide-bg">
               
@@ -106,7 +106,7 @@
           <div class="card-content">
             <h3>{{ post.title }}</h3>
             <p>{{ post.excerpt }}</p>
-            <a :href="'/sitio/post/' + post.id" class="link-arrow">Leer más <span class="arrow">→</span></a>
+            <a :href="'/post/' + post.id" class="link-arrow">Leer más <span class="arrow">→</span></a>
           </div>
         </article>
       </div>

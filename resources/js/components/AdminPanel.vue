@@ -34,7 +34,7 @@
           🔴 Cerrar Sesión
         </button>
       </nav>
-      <a href="https://eleden.site" class="back-link">← Ver Web</a>
+      <a :href="homeUrl" class="back-link">← Ver Web</a>
     </aside>
 
     <main class="content">
@@ -155,7 +155,8 @@ import axios from 'axios';
 const props = defineProps({
   initialData: Object 
 });
-
+const homeUrl = props.initialData.homeUrl || '/';
+const baseUrl = props.initialData.adminBaseUrl || '';
 const currentTab = ref('posts'); 
 const mediaType = ref('upload');
 const settings = ref(props.initialData.setting || { title: '', hero_text: '' });
@@ -208,7 +209,7 @@ const handleFileUpload = (event) => {
 
 const saveSettings = async () => {
   try {
-    await axios.post('/settings', settings.value);
+    await axios.post(`${baseUrl}/settings`, settings.value);
     showToast('Configuración actualizada correctamente');
   } catch (e) {
     showToast('Error al guardar configuración', 'error');
@@ -274,11 +275,11 @@ const savePost = async () => {
   }
 
   try {
-    let url = '/posts';
+    let url = `${baseUrl}/posts`;
     let msg = '¡Publicación creada exitosamente!';
 
     if (isEditing.value) {
-      url = `/posts/${editingId.value}`; 
+      url = `${baseUrl}/posts/${editingId.value}`; 
       formData.append('_method', 'PUT'); 
       msg = '¡Publicación actualizada correctamente!';
     }
@@ -302,7 +303,7 @@ const savePost = async () => {
 const deletePost = async (id) => {
   if (!confirm('¿Seguro que deseas eliminar esta publicación?')) return;
   try {
-    await axios.delete(`/posts/${id}`);
+    await axios.delete(`${baseUrl}/posts/${id}`);
     posts.value = posts.value.filter(post => post.id !== id);
     if (editingId.value === id) resetForm();
     showToast('Publicación eliminada', 'success');
@@ -314,7 +315,7 @@ const deletePost = async (id) => {
 const logout = async () => {
   try {
     await axios.post('/logout');
-    window.location.href = '/login';
+    window.location.href = `${baseUrl}/login`;
   } catch (e) { 
     showToast('Error al cerrar sesión', 'error'); 
   }

@@ -8,7 +8,7 @@
 </head>
 <body style="background-color: #f3f4f6;">
     <div id="app">
-        <admin-panel :initial-data="{{ json_encode(['setting' => $setting, 'posts' => $posts]) }}"></admin-panel>
+        <admin-panel :initial-data="{{ json_encode($initialData) }}"></admin-panel>
     </div>
 </body>
 </html>

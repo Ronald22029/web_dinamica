@@ -18,7 +18,7 @@ if ($isProduction) {
         
         Route::middleware(['auth'])->group(function () {
             Route::get('/', [AdminController::class, 'index'])->name('admin.index');
-            Route::post('/settings', [AdminController::class, 'updateSettings']);
+            Route::post('/settings', [AdminController::class, 'updateSettings'])->name('admin.settings.update');
             Route::post('/posts', [AdminController::class, 'storePost']);
             Route::delete('/posts/{id}', [AdminController::class, 'deletePost']);
             Route::put('/posts/{id}', [AdminController::class, 'storePost']);
@@ -33,19 +33,21 @@ if ($isProduction) {
     Route::domain('eleden.site')->group(function () {
         Route::get('/', [HomeController::class, 'index'])->name('home');
         Route::get('/categoria/{category}', [HomeController::class, 'index']);
+        Route::get('/post/{id}', [HomeController::class, 'show']);
     });
 
 } else {
     /* --- LOCAL: localhost:8000 --- */
     Route::get('/', [HomeController::class, 'index'])->name('home');
     Route::get('/categoria/{category}', [HomeController::class, 'index']);
+    Route::get('/post/{id}', [HomeController::class, 'show']);
 
     Route::prefix('admin')->group(function () {
         Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
         
         Route::middleware(['auth'])->group(function () {
             Route::get('/', [AdminController::class, 'index'])->name('admin.index');
-            Route::post('/settings', [AdminController::class, 'updateSettings']);
+            Route::post('/settings', [AdminController::class, 'updateSettings'])->name('admin.settings.update');
             Route::post('/posts', [AdminController::class, 'storePost']);
             Route::delete('/posts/{id}', [AdminController::class, 'deletePost']);
             Route::put('/posts/{id}', [AdminController::class, 'storePost']);
