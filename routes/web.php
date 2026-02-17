@@ -5,51 +5,58 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 
-// --------------------------------------------------------------------------
-// 1. RUTAS DE AUTENTICACIÓN
-// --------------------------------------------------------------------------
-Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+$host = request()->getHost();
+
+// Si estamos en producción (eleden.site), usamos subdominios.
+// Si estamos en local (localhost o 127.0.0.1), usamos prefijos simples.
+$isProduction = ($host === 'eleden.site' || $host === 'admin.eleden.site');
+
+if ($isProduction) {
+    /* --- PRODUCCIÓN: admin.eleden.site --- */
+    Route::domain('admin.eleden.site')->group(function () {
+        Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+        
+        Route::middleware(['auth'])->group(function () {
+            Route::get('/', [AdminController::class, 'index'])->name('admin.index');
+            Route::post('/settings', [AdminController::class, 'updateSettings']);
+            Route::post('/posts', [AdminController::class, 'storePost']);
+            Route::delete('/posts/{id}', [AdminController::class, 'deletePost']);
+            Route::put('/posts/{id}', [AdminController::class, 'storePost']);
+        });
+
+        Route::get('/', function () {
+            return redirect()->route('login');
+        })->middleware('guest');
+    });
+
+    /* --- PRODUCCIÓN: eleden.site --- */
+    Route::domain('eleden.site')->group(function () {
+        Route::get('/', [HomeController::class, 'index'])->name('home');
+        Route::get('/categoria/{category}', [HomeController::class, 'index']);
+    });
+
+} else {
+    /* --- LOCAL: localhost:8000 --- */
+    Route::get('/', [HomeController::class, 'index'])->name('home');
+    Route::get('/categoria/{category}', [HomeController::class, 'index']);
+
+    Route::prefix('admin')->group(function () {
+        Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+        
+        Route::middleware(['auth'])->group(function () {
+            Route::get('/', [AdminController::class, 'index'])->name('admin.index');
+            Route::post('/settings', [AdminController::class, 'updateSettings']);
+            Route::post('/posts', [AdminController::class, 'storePost']);
+            Route::delete('/posts/{id}', [AdminController::class, 'deletePost']);
+            Route::put('/posts/{id}', [AdminController::class, 'storePost']);
+        });
+    });
+}
+
+// Rutas compartidas (siempre iguales)
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// --------------------------------------------------------------------------
-// 2. PANEL DE ADMINISTRACIÓN (Ruta Raíz - PROTEGIDA)
-// --------------------------------------------------------------------------
-// Al entrar a la raíz '/', si no estás logueado te pedirá login.
-// Si estás logueado, verás el Dashboard del Admin.
-Route::middleware(['auth'])->group(function () {
-    
-    // Dashboard Principal
-    Route::get('/', [AdminController::class, 'index'])->name('admin.dashboard');
-
-    // Guardar configuraciones (Título, Texto Hero)
-    Route::post('/admin/settings', [AdminController::class, 'updateSettings']);
-
-    // --- Gestión de Posts (CRUD) ---
-    
-    // Crear nuevo post
-    Route::post('/admin/posts', [AdminController::class, 'storePost']);
-    
-    // Editar post existente (Asegúrate de tener el método 'updatePost' en AdminController)
-    Route::put('/admin/posts/{id}', [AdminController::class, 'updatePost']);
-    
-    // Eliminar post
-    Route::delete('/admin/posts/{id}', [AdminController::class, 'deletePost']);
-});
-
-// --------------------------------------------------------------------------
-// 3. SITIO WEB PÚBLICO (Accesible vía "/sitio")
-// --------------------------------------------------------------------------
-// Ejemplo: www.tuweb.com/sitio
-Route::prefix('sitio')->group(function () {
-    
-    // Portada del sitio web
-    Route::get('/', [HomeController::class, 'index'])->name('home');
-    
-    // Filtrar por categoría
-    Route::get('/categoria/{category}', [HomeController::class, 'index'])->name('home.category');
-
-    // Ver un post individual
-    // (Asegúrate de tener el método 'show' en HomeController)
-    Route::get('/post/{id}', [HomeController::class, 'show'])->name('post.show');
+Route::fallback(function () {
+    return redirect()->route('home');
 });

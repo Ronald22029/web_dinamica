@@ -14,27 +14,36 @@ class AuthController extends Controller
 
     // Procesar login
     public function login(Request $request) {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
-        ]);
+    $credentials = $request->validate([
+        'email' => ['required', 'email'],
+        'password' => ['required'],
+    ]);
 
-        if (Auth::attempt($credentials)) {
+    if (Auth::attempt($credentials)) {
         $request->session()->regenerate();
-        // CAMBIO: Redirigir a la raíz '/' (que ahora es el panel admin)
-        return redirect('/'); 
+        
+        // Si estamos en producción, la raíz '/' es el panel.
+        // En local, el panel está en '/admin'.
+        $host = request()->getHost();
+        $url = ($host === 'admin.eleden.site') ? '/' : '/admin';
+        
+        return redirect($url);
     }
 
-        return back()->withErrors([
-            'email' => 'Las credenciales no coinciden.',
-        ]);
-    }
+    return back()->withErrors(['email' => 'Credenciales incorrectas']);
+}
 
     // Cerrar sesión
-    public function logout(Request $request) {
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        return redirect('/login');
-    }
+    // Cerrar sesión
+public function logout(Request $request) {
+    Auth::logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+
+    // Si estamos en local, el login está en /admin/login
+    $host = request()->getHost();
+    $loginUrl = ($host === 'admin.eleden.site') ? '/login' : '/admin/login';
+
+    return redirect($loginUrl);
+}
 }
