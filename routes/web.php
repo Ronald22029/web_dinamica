@@ -8,6 +8,9 @@ use App\Http\Controllers\AuthController;
 $host = request()->getHost();
 $isProduction = ($host === 'eleden.site' || $host === 'admin.eleden.site');
 
+// Ruta del Sitemap SEO (siempre accesible)
+Route::get('/sitemap.xml', [HomeController::class, 'sitemap']);
+
 if ($isProduction) {
     /* --- PRODUCCIÓN: admin.eleden.site --- */
     Route::domain('admin.eleden.site')->group(function () {

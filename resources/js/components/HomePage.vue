@@ -23,6 +23,9 @@
 
     <header class="hero-section">
       <div class="aurora-bg"></div>
+
+      <!-- H1 siempre presente para SEO -->
+      <h1 v-if="pageData.carousel_posts && pageData.carousel_posts.length > 0" class="sr-only">{{ pageData.hero_title || 'ELEDEN – Tecnología, Eventos y Portafolio' }}</h1>
       
       <div v-if="pageData.carousel_posts && pageData.carousel_posts.length > 0" class="carousel-container">
         <div class="carousel-track" :style="{ transform: `translateX(-${currentSlide * 100}%)` }">
@@ -30,7 +33,7 @@
             
             <a :href="'/post/' + slide.id" class="slide-link">
               
-              <img :src="getThumbnail(slide)" class="slide-bg">
+              <img :src="getThumbnail(slide)" :alt="slide.title" class="slide-bg">
               
               <div class="slide-content glass-panel">
                 <span class="slide-badge">{{ slide.category }}</span>
@@ -44,21 +47,24 @@
           </div>
         </div>
 
-        <button @click="prevSlide" class="nav-btn prev">❮</button>
-        <button @click="nextSlide" class="nav-btn next">❯</button>
+        <button @click="prevSlide" class="nav-btn prev" aria-label="Slide anterior">❮</button>
+        <button @click="nextSlide" class="nav-btn next" aria-label="Slide siguiente">❯</button>
         
         <div class="indicators">
           <span v-for="(slide, index) in pageData.carousel_posts" 
                 :key="index" 
                 :class="{ active: currentSlide === index }"
-                @click="currentSlide = index"></span>
+                @click="currentSlide = index"
+                :aria-label="'Ir al slide ' + (index + 1)"></span>
         </div>
       </div>
 
       <div v-else class="container hero-content">
-        <span class="badge-pill" v-if="pageData.current_category !== 'home'">
-          Explorando {{ pageData.current_category }}
-        </span>
+        <nav class="breadcrumb" v-if="pageData.current_category !== 'home'" aria-label="Breadcrumb">
+          <a href="/">Inicio</a>
+          <span class="separator">/</span>
+          <span class="current">{{ pageData.current_category.charAt(0).toUpperCase() + pageData.current_category.slice(1) }}</span>
+        </nav>
         <h1 class="hero-title">{{ pageData.hero_title }}</h1>
         <p class="hero-subtitle">{{ pageData.hero_text }}</p>
         
@@ -69,6 +75,8 @@
     </header>
 
     <section id="content" class="container content-section">
+      <h2 class="section-heading">{{ pageData.current_category === 'home' ? 'Últimas publicaciones' : 'Artículos de ' + pageData.current_category.charAt(0).toUpperCase() + pageData.current_category.slice(1) }}</h2>
+
       <div v-if="pageData.posts.length === 0" class="empty-state">
         <div class="empty-icon">📭</div>
         <p>No hay publicaciones recientes en esta sección.</p>
@@ -83,6 +91,7 @@
             <div v-if="post.video_url && playingVideoId === post.id" class="video-container">
                <iframe 
                   :src="getEmbedUrl(post.video_url)" 
+                  :title="post.title"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
                   allowfullscreen>
                </iframe>
@@ -92,10 +101,10 @@
                  @click="post.video_url ? playVideo(post.id) : null"
                  :class="{ 'is-video': post.video_url }">
               
-              <img :src="getThumbnail(post)" alt="Post" :class="{ 'video-thumbnail': post.video_url }">
+              <img :src="getThumbnail(post)" :alt="post.title" :class="{ 'video-thumbnail': post.video_url }">
               
               <div class="card-overlay">
-                <span class="category-tag">{{ post.category }}</span>
+                <a :href="'/categoria/' + post.category" class="category-tag">{{ post.category }}</a>
               </div>
 
               <div v-if="post.video_url" class="play-icon-overlay">▶</div>
@@ -104,9 +113,12 @@
           </div>
 
           <div class="card-content">
-            <h3>{{ post.title }}</h3>
+            <h3><a :href="'/post/' + post.id" class="card-title-link">{{ post.title }}</a></h3>
             <p>{{ post.excerpt }}</p>
-            <a :href="'/post/' + post.id" class="link-arrow">Leer más <span class="arrow">→</span></a>
+            <div class="card-footer">
+              <a :href="'/categoria/' + post.category" class="category-link">{{ post.category }}</a>
+              <a :href="'/post/' + post.id" class="link-arrow">Leer más <span class="arrow">→</span></a>
+            </div>
           </div>
         </article>
       </div>
@@ -313,7 +325,7 @@ onUnmounted(() => {
 .indicators span.active { background: white; transform: scale(1.4); }
 
 /* CARDS */
-.hero-title { font-size: 4rem; margin-bottom: 20px; font-weight: 800; background: linear-gradient(135deg, #0f172a 0%, #334155 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.hero-title { font-size: 4rem; margin-bottom: 20px; font-weight: 800; background: linear-gradient(135deg, #0f172a 0%, #334155 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
 .hero-subtitle { font-size: 1.25rem; color: #64748b; margin-bottom: 30px; }
 .badge-pill { background: rgba(59, 130, 246, 0.1); color: #2563eb; padding: 8px 16px; border-radius: 100px; font-weight: 700; margin-bottom: 20px; display: inline-block; }
 .btn-primary { background: #0f172a; color: white; padding: 12px 24px; border-radius: 10px; text-decoration: none; font-weight: 600; }
@@ -350,6 +362,44 @@ onUnmounted(() => {
 .modern-footer { text-align: center; padding: 60px 0; color: #94a3b8; font-size: 0.9rem; border-top: 1px solid #f1f5f9; }
 .dim { opacity: 0.6; }
 .empty-state { text-align: center; color: #64748b; margin-top: 50px; }
+
+/* SR-ONLY para H1 invisible pero accesible */
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+}
+
+/* SECTION HEADING */
+.section-heading {
+  font-size: 1.8rem; font-weight: 800; color: #0f172a; margin-bottom: 40px;
+  position: relative; display: inline-block;
+}
+.section-heading::after {
+  content: ''; position: absolute; bottom: -8px; left: 0;
+  width: 50px; height: 4px; background: linear-gradient(90deg, #3b82f6, #8b5cf6); border-radius: 2px;
+}
+
+/* BREADCRUMB */
+.breadcrumb {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 20px;
+  font-size: 0.9rem; font-weight: 500;
+}
+.breadcrumb a { color: #3b82f6; text-decoration: none; }
+.breadcrumb a:hover { text-decoration: underline; }
+.breadcrumb .separator { color: #94a3b8; }
+.breadcrumb .current { color: #64748b; }
+
+/* CARD FOOTER & CATEGORY LINK */
+.card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
+.category-link {
+  background: #eff6ff; color: #2563eb; padding: 4px 12px; border-radius: 100px;
+  font-size: 0.75rem; font-weight: 700; text-transform: uppercase; text-decoration: none;
+  transition: background 0.2s;
+}
+.category-link:hover { background: #dbeafe; }
+.card-title-link { text-decoration: none; color: inherit; }
+.card-title-link:hover { color: #3b82f6; }
+.category-tag { text-decoration: none; color: inherit; }
 
 @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }

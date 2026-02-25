@@ -6,7 +6,7 @@
         <a href="/" class="brand">
           <span>EL<span class="highlight">.EDEN</span></span>
         </a>
-        <a href="/sitio"class="btn-back">
+        <a href="/" class="btn-back">
           <span class="icon-arrow">←</span> <span>Volver</span>
         </a>
       </div>
@@ -16,9 +16,18 @@
 
     <article class="article-layout container">
       
+      <!-- Breadcrumb para SEO -->
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="/">Inicio</a>
+        <span class="separator">/</span>
+        <a :href="'/categoria/' + post.category">{{ post.category.charAt(0).toUpperCase() + post.category.slice(1) }}</a>
+        <span class="separator">/</span>
+        <span class="current">{{ post.title }}</span>
+      </nav>
+
       <header class="card header-card">
         <div class="meta-row">
-          <span class="category-pill">{{ post.category }}</span>
+          <a :href="'/categoria/' + post.category" class="category-pill">{{ post.category }}</a>
           <span class="date">{{ formatDate(post.created_at) }}</span>
         </div>
         
@@ -48,7 +57,7 @@
         <div class="prose" v-html="post.content"></div>
 
         <div class="share-section">
-          <h4 class="share-title">¿Te gustó? ¡Compártelo!</h4>
+          <h2 class="share-title">¿Te gustó? ¡Compártelo!</h2>
           <div class="share-buttons">
             
             <button @click="share('whatsapp')" class="btn-share whatsapp" title="Compartir en WhatsApp">
@@ -76,8 +85,22 @@
         </div>
       </div>
 
+      <!-- Artículos Relacionados para SEO (enlaces internos) -->
+      <div v-if="relatedPosts.length > 0" class="card related-section">
+        <h2 class="related-title">Artículos relacionados</h2>
+        <div class="related-grid">
+          <a v-for="rp in relatedPosts" :key="rp.id" :href="'/post/' + rp.id" class="related-card">
+            <img :src="getThumbnail(rp)" :alt="rp.title" class="related-img">
+            <div class="related-info">
+              <span class="related-category">{{ rp.category }}</span>
+              <h3>{{ rp.title }}</h3>
+            </div>
+          </a>
+        </div>
+      </div>
+
       <div class="footer-actions">
-        <a href="/sitio" class="btn-outline">Ver más artículos</a>
+        <a href="/" class="btn-outline">Ver más artículos</a>
       </div>
 
     </article>
@@ -95,8 +118,22 @@ const props = defineProps({
 });
 
 const post = ref(props.initialData.post);
+const relatedPosts = ref(props.initialData.related_posts || []);
 const isScrolled = ref(false);
 const copied = ref(false);
+
+const getThumbnail = (p) => {
+  if (p.image) return p.image;
+  if (p.video_url) {
+    if (p.video_url.includes('youtube.com') || p.video_url.includes('youtu.be')) {
+      const videoId = p.video_url.split('v=')[1] || p.video_url.split('/').pop();
+      const cleanId = videoId ? videoId.split('&')[0].split('?')[0] : null;
+      if (cleanId) return `https://img.youtube.com/vi/${cleanId}/hqdefault.jpg`;
+    }
+    return 'https://ui-avatars.com/api/?name=Post&background=1e293b&color=fff&size=512';
+  }
+  return 'https://via.placeholder.com/400x250?text=Sin+Imagen';
+};
 
 const handleScroll = () => {
   isScrolled.value = window.scrollY > 20;
@@ -256,8 +293,51 @@ onUnmounted(() => {
 .btn-outline:hover { border-color: #0f172a; color: #0f172a; background: white; transform: translateY(-2px); }
 .modern-footer { text-align: center; padding: 60px 0 20px; color: #94a3b8; font-size: 0.85rem; }
 
+/* BREADCRUMB */
+.breadcrumb {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  font-size: 0.85rem; font-weight: 500; margin-bottom: 10px;
+}
+.breadcrumb a { color: #3b82f6; text-decoration: none; }
+.breadcrumb a:hover { text-decoration: underline; }
+.breadcrumb .separator { color: #94a3b8; }
+.breadcrumb .current { color: #94a3b8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 300px; }
+.category-pill { text-decoration: none; display: inline-block; }
+.category-pill:hover { background: #dbeafe; }
+
+/* RELATED POSTS */
+.related-section { padding: 40px; }
+.related-title {
+  font-size: 1.3rem; font-weight: 800; color: #0f172a; margin-bottom: 24px;
+  position: relative; display: inline-block;
+}
+.related-title::after {
+  content: ''; position: absolute; bottom: -6px; left: 0;
+  width: 40px; height: 3px; background: linear-gradient(90deg, #3b82f6, #8b5cf6); border-radius: 2px;
+}
+.related-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px;
+}
+.related-card {
+  display: flex; flex-direction: column; border-radius: 16px; overflow: hidden;
+  background: #f8fafc; text-decoration: none; color: inherit;
+  transition: transform 0.3s, box-shadow 0.3s; border: 1px solid #f1f5f9;
+}
+.related-card:hover { transform: translateY(-4px); box-shadow: 0 10px 25px rgba(0,0,0,0.06); }
+.related-img { width: 100%; height: 160px; object-fit: cover; }
+.related-info { padding: 16px; }
+.related-category {
+  font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: #2563eb;
+  background: #eff6ff; padding: 3px 10px; border-radius: 100px;
+}
+.related-info h3 {
+  font-size: 1rem; margin-top: 10px; font-weight: 700; color: #1e293b;
+  line-height: 1.3;
+}
+
 @media (max-width: 768px) {
   .title { font-size: 2rem; }
   .content-card { padding: 30px 24px; }
+  .related-grid { grid-template-columns: 1fr; }
 }
 </style>

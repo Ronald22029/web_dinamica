@@ -5,6 +5,10 @@
 
     RewriteEngine On
 
+    # Redirect www to non-www (301)
+    RewriteCond %{HTTP_HOST} ^www\.eleden\.site$ [NC]
+    RewriteRule ^(.*)$ https://eleden.site/$1 [L,R=301]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]

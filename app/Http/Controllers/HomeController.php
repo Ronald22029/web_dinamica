@@ -34,13 +34,15 @@ class HomeController extends Controller
         // 2. Filtros y Metadatos
         $query = Post::query();
         $pageTitle = $siteTitle;
-        $metaDescription = "Lo mejor de $siteTitle";
+
+        // Meta descriptions mejoradas (120-160 caracteres)
+        $metaDescription = "Descubre las últimas tendencias en tecnología, eventos únicos y proyectos de portafolio en {$siteTitle}. Tu fuente de inspiración digital para el mundo moderno.";
 
         if ($category) {
             $query->where('category', $category);
             $pageTitle = ucfirst($category) . " - " . $siteTitle;
             $heroText = "Explora los últimos artículos sobre " . ucfirst($category);
-            $metaDescription = "Artículos sobre " . ucfirst($category) . " en $siteTitle";
+            $metaDescription = "Explora los mejores artículos sobre " . ucfirst($category) . " en {$siteTitle}. Contenido actualizado con las últimas novedades y tendencias del sector.";
         }
 
         // 3. Obtener posts
@@ -90,23 +92,48 @@ class HomeController extends Controller
             $siteTitle = $setting->title;
         }
 
+        // Meta description mejorada: usar excerpt truncado a 160 chars
+        $metaDescription = $post->excerpt 
+            ? \Illuminate\Support\Str::limit($post->excerpt, 155, '...') 
+            : "Lee el artículo \"{$post->title}\" en {$siteTitle}. Contenido de calidad sobre {$post->category}.";
+
         // SEO — datos para las meta tags del <head> (server-side)
         $seo = [
             'title'       => $post->title . ' - ' . $siteTitle,
-            'description' => $post->excerpt ?? '',
+            'description' => $metaDescription,
             'url'         => url()->current(),
             'image'       => $this->absoluteImageUrl($post->image),
             'site_name'   => $siteTitle,
             'type'        => 'article',
         ];
 
+        // Artículos relacionados (misma categoría, excluir el actual, máximo 3)
+        $relatedPosts = Post::where('category', $post->category)
+            ->where('id', '!=', $post->id)
+            ->latest()
+            ->take(3)
+            ->get();
+
         // Datos para Vue
         $data = [
             'meta_title' => $post->title . ' - ' . $siteTitle,
-            'meta_description' => $post->excerpt,
-            'post' => $post
+            'meta_description' => $metaDescription,
+            'post' => $post,
+            'related_posts' => $relatedPosts,
         ];
 
         return view('post', compact('data', 'seo'));
+    }
+
+    /**
+     * Genera el sitemap.xml dinámico.
+     */
+    public function sitemap()
+    {
+        $posts = Post::latest()->get();
+
+        return response()
+            ->view('sitemap', ['posts' => $posts])
+            ->header('Content-Type', 'application/xml');
     }
 }

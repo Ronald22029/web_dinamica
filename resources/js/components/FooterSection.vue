@@ -3,9 +3,9 @@
     <div class="footer-content container">
       
       <div class="footer-col brand-col">
-        <a href="/sitio" class="brand-link">
+        <a href="/" class="brand-link">
           <div class="logo-box">
-            <img :src="'/images/logo.jpg'" alt="Logo" class="footer-logo">
+            <img :src="'/images/logo.jpg'" alt="Logo de ELEDEN" class="footer-logo">
           </div>
           <span class="brand-text">EL<span class="highlight">.EDEN</span></span>
         </a>
@@ -15,27 +15,27 @@
       </div>
 
       <div class="footer-col links-col">
-        <h4>Explorar</h4>
+        <span class="footer-heading" role="heading" aria-level="2">Explorar</span>
         <ul>
-          <li><a href="/sitio">Inicio</a></li>
-          <li><a href="/sitio/categoria/eventos">Eventos</a></li>
-          <li><a href="/sitio/categoria/tecnologia">Tecnología</a></li>
-          <li><a href="/sitio/categoria/portafolio">Portafolio</a></li>
+          <li><a href="/">Inicio</a></li>
+          <li><a href="/categoria/eventos">Eventos</a></li>
+          <li><a href="/categoria/tecnologia">Tecnología</a></li>
+          <li><a href="/categoria/portafolio">Portafolio</a></li>
         </ul>
       </div>
 
       <div class="footer-col contact-col">
-        <h4>Contáctanos</h4>
+        <span class="footer-heading" role="heading" aria-level="2">Contáctanos</span>
         <ul class="contact-list">
           <li>
             <span class="icon">📞</span>
-            <a href="https://wa.me/59174464344" target="_blank" class="phone-link">
+            <a href="https://wa.me/59174464344" target="_blank" rel="noopener noreferrer" class="phone-link">
               Whatsapp
             </a>
           </li>
           <li>
             <span class="icon">📧</span>
-            <span>contacto@webeleden.com</span>
+            <a href="mailto:contacto@webeleden.com">contacto@webeleden.com</a>
           </li>
           <li>
             <span class="icon">📍</span>
@@ -45,11 +45,11 @@
       </div>
 
       <div class="footer-col social-col">
-        <h4>Síguenos</h4>
+        <span class="footer-heading" role="heading" aria-level="2">Síguenos</span>
         <div class="social-icons">
-          <a href="#" class="social-btn fb">FB</a>
-          <a href="#" class="social-btn ig">IG</a>
-          <a href="#" class="social-btn tk">TK</a>
+          <a href="#" class="social-btn fb" aria-label="Facebook">FB</a>
+          <a href="#" class="social-btn ig" aria-label="Instagram">IG</a>
+          <a href="#" class="social-btn tk" aria-label="TikTok">TK</a>
         </div>
       </div>
 
@@ -105,11 +105,11 @@
 .brand-desc { line-height: 1.6; font-size: 0.95rem; max-width: 300px; }
 
 /* TITULOS DE COLUMNA */
-h4 {
+.footer-heading {
   color: white; font-size: 1.1rem; font-weight: 700; margin-bottom: 24px;
   position: relative; display: inline-block;
 }
-h4::after {
+.footer-heading::after {
   content: ''; position: absolute; left: 0; bottom: -8px;
   width: 30px; height: 3px; background: #3b82f6; border-radius: 2px;
 }

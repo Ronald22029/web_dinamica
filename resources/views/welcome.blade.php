@@ -7,8 +7,13 @@
     {{-- ====== SEO Básico ====== --}}
     <title>{{ $seo['title'] }}</title>
     <meta name="description" content="{{ $seo['description'] }}">
+    <meta name="robots" content="index, follow">
     <link rel="canonical" href="{{ $seo['url'] }}">
     <meta name="theme-color" content="#3b82f6">
+
+    {{-- ====== Favicon ====== --}}
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/logo.jpg">
 
     {{-- ====== Open Graph (Facebook, WhatsApp, LinkedIn) ====== --}}
     <meta property="og:type"        content="{{ $seo['type'] }}">
@@ -16,6 +21,7 @@
     <meta property="og:description" content="{{ $seo['description'] }}">
     <meta property="og:url"         content="{{ $seo['url'] }}">
     <meta property="og:site_name"   content="{{ $seo['site_name'] }}">
+    <meta property="og:locale"      content="es_ES">
     @if($seo['image'])
     <meta property="og:image"       content="{{ $seo['image'] }}">
     <meta property="og:image:width" content="1200">
@@ -38,6 +44,11 @@
         'name' => $seo['site_name'],
         'url' => $seo['url'],
         'description' => $seo['description'],
+        'potentialAction' => [
+            '@type' => 'SearchAction',
+            'target' => url('/') . '/categoria/{search_term_string}',
+            'query-input' => 'required name=search_term_string',
+        ],
     ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}
     </script>
 
