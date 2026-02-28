@@ -429,7 +429,7 @@ const padrinos = computed(() => data.value.padrinos || []);
 // MÚSICA
 const musicUrl = computed(() => data.value.music_url || '');
 const audioRef = ref(null);
-const isPlaying = ref(true);
+const isPlaying = ref(false); // Iniciar siempre en pausa tal como solicitó el usuario
 const volume = ref(0.5);
 
 const toggleAudio = () => {
@@ -514,42 +514,7 @@ const sendRSVP = async () => {
   }
 };
 
-const tryAutoplay = () => {
-  if (audioRef.value && musicUrl.value) {
-    let playPromise = audioRef.value.play();
-    
-    if (playPromise !== undefined) {
-      playPromise.then(() => {
-        isPlaying.value = true;
-      }).catch(e => {
-        console.log('Autoplay bloqueado. Esperando interacción del usuario.');
-        isPlaying.value = false;
-        
-        const playOnInteraction = () => {
-          if (audioRef.value) {
-            let p = audioRef.value.play();
-            if (p !== undefined) {
-              p.then(() => {
-                isPlaying.value = true;
-                removeListeners(); 
-              }).catch(err => console.log('Esperando...', err));
-            }
-          }
-        };
-        
-        const removeListeners = () => {
-          window.removeEventListener('click', playOnInteraction);
-          window.removeEventListener('scroll', playOnInteraction);
-          window.removeEventListener('touchstart', playOnInteraction);
-        };
-
-        window.addEventListener('click', playOnInteraction);
-        window.addEventListener('scroll', playOnInteraction);
-        window.addEventListener('touchstart', playOnInteraction);
-      });
-    }
-  }
-};
+// La función tryAutoplay se eliminó a petición del usuario para evitar reproducción automática.
 
 const registerVisit = async () => {
     if (!props.invitation.id) return; // Saltamos en demos sin ID
@@ -561,7 +526,7 @@ const registerVisit = async () => {
 // Animación scroll itinerario
 onMounted(() => {
   registerVisit();
-  setTimeout(tryAutoplay, 1000); // Pequeño delay para asegurar carga
+  // No se llama a tryAutoplay() para forzar reproducción
   
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
