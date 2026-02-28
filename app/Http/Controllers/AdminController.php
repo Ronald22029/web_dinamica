@@ -185,6 +185,7 @@ class AdminController extends Controller
     private function saveOrUpdateInvitation(Request $request, Invitation $invitation) {
         $request->validate([
             'title' => 'required',
+            'music_file' => 'nullable|file|mimes:mp3,wav|max:10240', // 10MB limit
         ]);
 
         $invitation->title = $request->title;
@@ -246,24 +247,34 @@ class AdminController extends Controller
 
         $invitation->gallery_images = $gallery;
 
-        // Manejo de archivo de música (.mp3)
+        // Manejo de archivo de música (.mp3) directos a public_path('audio')
     if ($request->hasFile('music_file')) {
-        // Borrar anterior si existe
+        // Borrar anterior si existe dentro de /audio directo
         $data = $invitation->data ?? [];
         if (isset($data['music_url'])) {
-            $oldMusicPath = str_replace('/storage/', '', $data['music_url']);
-            Storage::disk('public')->delete($oldMusicPath);
+            $oldMusicPath = str_replace('/audio/', '', $data['music_url']);
+            $fullPath = public_path('audio/' . ltrim($oldMusicPath, '/'));
+            if (file_exists($fullPath) && is_file($fullPath)) {
+                @unlink($fullPath);
+            }
         }
 
-        $musicPath = $request->file('music_file')->store('audio', 'public');
-        $data['music_url'] = '/storage/' . $musicPath;
+        $file = $request->file('music_file');
+        // Limpiar nombre original para evitar caracteres raros
+        $originalName = preg_replace('/[^A-Za-z0-9\-\_\.]/', '', $file->getClientOriginalName());
+        $filename = time() . '_' . $originalName;
+        $file->move(public_path('audio'), $filename);
+        $data['music_url'] = '/audio/' . $filename;
         $invitation->data = $data;
     } elseif ($request->input('remove_music') == '1') {
         // El admin eliminó la música — borrar archivo del disco
         $data = $invitation->data ?? [];
         if (isset($data['music_url'])) {
-            $oldMusicPath = str_replace('/storage/', '', $data['music_url']);
-            Storage::disk('public')->delete($oldMusicPath);
+            $oldMusicPath = str_replace('/audio/', '', $data['music_url']);
+            $fullPath = public_path('audio/' . ltrim($oldMusicPath, '/'));
+            if (file_exists($fullPath) && is_file($fullPath)) {
+                @unlink($fullPath);
+            }
             unset($data['music_url']);
             $invitation->data = $data;
         }
