@@ -210,7 +210,7 @@ class HomeController extends Controller
                     'reception_time' => '20:00',
                     'reception_location' => 'Salón Vista Bella',
                     'theme_color' => '#2c3e50',
-                    'music_url' => '/storage/audio/Boda2.mp3',
+                    'music_url' => 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
                     'whatsapp_rsvp' => '59178945612',
                     'itinerary' => [
                         ['time' => '17:30', 'activity' => 'Bienvenida', 'description' => 'Cóctel de entrada.'],
