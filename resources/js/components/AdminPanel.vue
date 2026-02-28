@@ -958,14 +958,11 @@ const saveInvitation = async () => {
   });
 
   try {
-    let base = baseUrl || '/admin';
-    if (!base.startsWith('/')) base = '/' + base;
-    
-    let url = `${base}/invitations`;
+    let url = `${baseUrl}/invitations`;
     let msg = '¡Invitación creada exitosamente!';
 
     if (isEditingInv.value) {
-      url = `${base}/invitations/${editingInvId.value}`; 
+      url = `${baseUrl}/invitations/${editingInvId.value}`; 
       formData.append('_method', 'PUT'); 
       msg = '¡Invitación actualizada correctamente!';
     }
