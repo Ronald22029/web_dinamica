@@ -22,6 +22,13 @@ if ($isProduction) {
             Route::post('/posts', [AdminController::class, 'storePost']);
             Route::delete('/posts/{id}', [AdminController::class, 'deletePost']);
             Route::put('/posts/{id}', [AdminController::class, 'updatePost']);
+
+            // Invitaciones (Admin)
+            Route::post('/invitations', [AdminController::class, 'storeInvitation']);
+            Route::delete('/invitations/{id}', [AdminController::class, 'deleteInvitation']);
+            Route::put('/invitations/{id}', [AdminController::class, 'updateInvitation']); 
+            Route::get('/invitations/{id}/stats', [AdminController::class, 'getInvitationStats']);
+            Route::post('/invitations/{id}/assign-user', [AdminController::class, 'assignUser']);
         });
     });
 
@@ -30,6 +37,12 @@ if ($isProduction) {
         Route::get('/', [HomeController::class, 'index'])->name('home');
         Route::get('/categoria/{category}', [HomeController::class, 'index']);
         Route::get('/post/{id}', [HomeController::class, 'show']);
+        Route::get('/invitaciones', [HomeController::class, 'invitations']);
+        Route::get('/invitacion/{slug}', [HomeController::class, 'showInvitation']);
+        
+        // Públicas para RSVP y Visitas
+        Route::post('/invitacion/{id}/rsvp', [AdminController::class, 'storeRSVP']);
+        Route::post('/invitacion/{id}/visit', [AdminController::class, 'incrementVisits']);
     });
 
 } else {
@@ -37,6 +50,12 @@ if ($isProduction) {
     Route::get('/', [HomeController::class, 'index'])->name('home');
     Route::get('/categoria/{category}', [HomeController::class, 'index']);
     Route::get('/post/{id}', [HomeController::class, 'show']);
+    Route::get('/invitaciones', [HomeController::class, 'invitations']);
+    Route::get('/invitacion/{slug}', [HomeController::class, 'showInvitation']);
+
+    // Públicas locales
+    Route::post('/invitacion/{id}/rsvp', [AdminController::class, 'storeRSVP']);
+    Route::post('/invitacion/{id}/visit', [AdminController::class, 'incrementVisits']);
     
     Route::prefix('admin')->group(function () {
         Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -47,6 +66,13 @@ if ($isProduction) {
             Route::post('/posts', [AdminController::class, 'storePost']);
             Route::delete('/posts/{id}', [AdminController::class, 'deletePost']);
             Route::put('/posts/{id}', [AdminController::class, 'updatePost']);
+
+            // Invitaciones (Admin local)
+            Route::post('/invitations', [AdminController::class, 'storeInvitation']);
+            Route::delete('/invitations/{id}', [AdminController::class, 'deleteInvitation']);
+            Route::put('/invitations/{id}', [AdminController::class, 'updateInvitation']);
+            Route::get('/invitations/{id}/stats', [AdminController::class, 'getInvitationStats']);
+            Route::post('/invitations/{id}/assign-user', [AdminController::class, 'assignUser']);
         });
     });
 }

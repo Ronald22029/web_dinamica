@@ -35,11 +35,11 @@
         <p class="excerpt">{{ post.excerpt }}</p>
       </header>
 
-      <div class="multimedia-section video-wrapper" v-if="post.video_url">
+      <div class="multimedia-section video-wrapper" v-if="post.video_url" :class="{ 'video-vertical': isVertical(post.video_url) }">
         <iframe 
           :src="getEmbedUrl(post.video_url)" 
           frameborder="0" 
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
           allowfullscreen
           class="video-iframe">
         </iframe>
@@ -122,15 +122,31 @@ const relatedPosts = ref(props.initialData.related_posts || []);
 const isScrolled = ref(false);
 const copied = ref(false);
 
+const isVertical = (url) => {
+  if (!url) return false;
+  return url.includes('tiktok.com') || url.includes('/shorts/') || url.includes('/reel/');
+};
+
 const getThumbnail = (p) => {
   if (p.image) return p.image;
   if (p.video_url) {
-    if (p.video_url.includes('youtube.com') || p.video_url.includes('youtu.be')) {
-      const videoId = p.video_url.split('v=')[1] || p.video_url.split('/').pop();
+    const url = p.video_url;
+    if (url.includes('youtube.com') || url.includes('youtu.be')) {
+      let videoId = '';
+      if (url.includes('/shorts/')) {
+        videoId = url.split('/shorts/')[1].split('?')[0];
+      } else {
+        videoId = url.split('v=')[1] || url.split('/').pop();
+      }
       const cleanId = videoId ? videoId.split('&')[0].split('?')[0] : null;
       if (cleanId) return `https://img.youtube.com/vi/${cleanId}/hqdefault.jpg`;
     }
-    return 'https://ui-avatars.com/api/?name=Post&background=1e293b&color=fff&size=512';
+    if (url.includes('dai.ly') || url.includes('dailymotion.com')) {
+      const parts = url.split('/');
+      const videoId = parts[parts.length - 1].split('?')[0];
+      if (videoId) return `https://www.dailymotion.com/thumbnail/video/${videoId}`;
+    }
+    return 'https://ui-avatars.com/api/?name=Video&background=1e293b&color=fff&size=512';
   }
   return 'https://via.placeholder.com/400x250?text=Sin+Imagen';
 };
@@ -152,11 +168,28 @@ const formatDate = (dateString) => {
 const getEmbedUrl = (url) => {
   if (!url) return '';
   if (url.includes('youtube.com') || url.includes('youtu.be')) {
-    const videoId = url.split('v=')[1] || url.split('/').pop();
+    let videoId = '';
+    if (url.includes('/shorts/')) {
+       videoId = url.split('/shorts/')[1].split('?')[0];
+    } else {
+       videoId = url.split('v=')[1] || url.split('/').pop();
+    }
     const cleanId = videoId ? videoId.split('&')[0].split('?')[0] : '';
     return `https://www.youtube.com/embed/${cleanId}`;
   }
-  if (url.includes('facebook.com')) {
+  if (url.includes('dai.ly') || url.includes('dailymotion.com')) {
+    const parts = url.split('/');
+    const videoId = parts[parts.length - 1].split('?')[0];
+    return `https://www.dailymotion.com/embed/video/${videoId}`;
+  }
+  if (url.includes('tiktok.com')) {
+    if (url.includes('/video/')) {
+       const videoId = url.split('/video/')[1].split('?')[0];
+       return `https://www.tiktok.com/embed/v2/${videoId}`;
+    }
+    return url; 
+  }
+  if (url.includes('facebook.com') || url.includes('fb.watch')) {
       return `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=0&width=560`;
   }
   return url;
@@ -260,6 +293,7 @@ onUnmounted(() => {
 .multimedia-section { width: 100%; border-radius: 24px; overflow: hidden; box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.08); margin-top: -10px; margin-bottom: -10px; z-index: 2; background: #000; }
 .hero-image { width: 100%; height: auto; max-height: 500px; object-fit: cover; display: block; }
 .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; }
+.video-wrapper.video-vertical { padding-bottom: 177.77%; max-width: 400px; margin: 0 auto; }
 .video-iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
 
 /* CONTENT & SHARE */

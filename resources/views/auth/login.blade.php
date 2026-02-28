@@ -70,6 +70,35 @@
             box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
         }
 
+        .password-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 0;
+            width: auto;
+            box-shadow: none;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .toggle-password:hover {
+            background: none;
+            transform: none;
+            box-shadow: none;
+            color: #fff;
+        }
+
         button {
             width: 100%;
             padding: 16px;
@@ -114,17 +143,45 @@
         <form action="/login" method="POST">
             @csrf
             <div class="input-group">
-                <label>Email</label>
-                <input type="email" name="email" placeholder="admin@ronald.dev" required value="{{ old('email') }}">
+                <label>Usuario o Correo</label>
+                <input type="text" name="login" placeholder="admin o admin@ronald.dev" required value="{{ old('login') }}">
             </div>
 
             <div class="input-group">
                 <label>Contraseña</label>
-                <input type="password" name="password" placeholder="••••••••" required>
+                <div class="password-container">
+                    <input type="password" id="password" name="password" placeholder="••••••••" required>
+                    <button type="button" id="togglePassword" class="toggle-password" title="Mostrar/Ocultar contraseña">
+                        <!-- Icono SVG Ojo -->
+                        <svg id="eyeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
             </div>
 
             <button type="submit">Iniciar Sesión</button>
         </form>
     </div>
+
+    <script>
+        const togglePassword = document.getElementById('togglePassword');
+        const passwordInput = document.getElementById('password');
+        const eyeIcon = document.getElementById('eyeIcon');
+
+        togglePassword.addEventListener('click', function () {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+
+            if (type === 'text') {
+                // Cambiar ícono a "Ojo tachado" (Ocultar)
+                eyeIcon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+            } else {
+                // Cambiar ícono a "Ojo normal" (Mostrar)
+                eyeIcon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+            }
+        });
+    </script>
 </body>
 </html>

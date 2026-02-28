@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\SiteSetting;
 use App\Models\Post;
+use App\Models\Invitation;
 
 class HomeController extends Controller
 {
@@ -82,6 +83,38 @@ class HomeController extends Controller
         return view('welcome', compact('data', 'seo'));
     }
 
+    public function invitations()
+    {
+        $setting = SiteSetting::first();
+        $siteTitle = $setting ? $setting->title : 'ELEDEN';
+        
+        $pageTitle = "Invitaciones - " . $siteTitle;
+        $metaDescription = "Descubre nuestras invitaciones digitales personalizadas. Diseño único para eventos especiales como bodas, quinceaños y cumpleaños.";
+
+        $invitations = Invitation::where('is_demo', true)->latest()->get();
+
+        $seo = [
+            'title'       => $pageTitle,
+            'description' => $metaDescription,
+            'url'         => url()->current(),
+            'image'       => null,
+            'site_name'   => $siteTitle,
+            'type'        => 'website',
+        ];
+
+        $data = [
+            'meta_title' => $pageTitle,
+            'meta_description' => $metaDescription,
+            'hero_title' => 'Invitaciones',
+            'hero_text' => 'Catálogo de invitaciones digitales para tus eventos.',
+            'current_category' => 'invitaciones',
+            'invitations' => $invitations,
+        ];
+
+        // Usaremos la vista welcome.blade.php que montará un nuevo componente general o manejaremos la lógica en Vue
+        return view('welcome', compact('data', 'seo'));
+    }
+
     public function show($id)
     {
         $post = Post::findOrFail($id);
@@ -123,6 +156,81 @@ class HomeController extends Controller
         ];
 
         return view('post', compact('data', 'seo'));
+    }
+
+    public function showInvitation($slug)
+    {
+        if ($slug === 'boda1') {
+            $invitation = new \App\Models\Invitation([
+                'title' => 'Boda Especial (Demo)',
+                'slug' => 'boda1',
+                'template' => 'boda1',
+                'client_name' => 'Marcela & Alejandro',
+                'event_date' => date('Y-m-d', strtotime('+30 days')),
+                'data' => [
+                    'bride' => 'Marcela',
+                    'groom' => 'Alejandro',
+                    'ceremony_time' => '16:00',
+                    'ceremony_location' => 'Parroquia San Miguel Arcángel',
+                    'reception_time' => '19:00',
+                    'reception_location' => 'Hacienda Los Arcángeles',
+                    'theme_color' => '#ba966a',
+                    'itinerary' => [
+                        ['time' => '16:00', 'activity' => 'Ceremonia Religiosa', 'description' => 'Acompáñanos a dar el sí.'],
+                        ['time' => '18:00', 'activity' => 'Recepción y Cóctel', 'description' => 'Llegada a la hacienda.'],
+                        ['time' => '19:00', 'activity' => 'Cena', 'description' => 'Un festín para celebrar.'],
+                        ['time' => '21:00', 'activity' => 'Primer Baile', 'description' => 'El comienzo de la fiesta.']
+                    ],
+                    'padrinos' => [
+                        ['role' => 'Padrinos de Anillos', 'name' => 'Luis & Valentina'],
+                        ['role' => 'Padrinos de Civil', 'name' => 'Carlos & Andrea']
+                    ]
+                ],
+                'gallery_images' => [
+                    'https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1519225421980-715cb0215aed?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1520854221256-17451cc331bf?auto=format&fit=crop&w=800&q=80'
+                ]
+            ]);
+            return view('invitation', compact('invitation'));
+        }
+
+        if ($slug === 'boda2') {
+            $invitation = new \App\Models\Invitation([
+                'title' => 'Boda Moderna (Demo)',
+                'slug' => 'boda2',
+                'template' => 'boda2',
+                'client_name' => 'Sofia & Roberto',
+                'event_date' => date('Y-m-d', strtotime('+45 days')),
+                'data' => [
+                    'bride' => 'Sofia',
+                    'groom' => 'Roberto',
+                    'ceremony_time' => '17:30',
+                    'ceremony_location' => 'Jardín de las Rosas',
+                    'reception_time' => '20:00',
+                    'reception_location' => 'Salón Vista Bella',
+                    'theme_color' => '#2c3e50',
+                    'music_url' => '/storage/audio/Boda2.mp3',
+                    'whatsapp_rsvp' => '59178945612',
+                    'itinerary' => [
+                        ['time' => '17:30', 'activity' => 'Bienvenida', 'description' => 'Cóctel de entrada.'],
+                        ['time' => '18:30', 'activity' => 'Intercambio de Votos', 'description' => 'Bajo el atardecer.'],
+                        ['time' => '21:00', 'activity' => 'Fiesta Moderna', 'description' => 'DJ y mucha diversión.']
+                    ],
+                    'padrinos' => [
+                        ['role' => 'Padrinos de Honor', 'name' => 'Dr. Fernando & Elena'],
+                    ]
+                ],
+                'gallery_images' => [
+                    'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&w=800&q=80'
+                ]
+            ]);
+            return view('invitation', compact('invitation'));
+        }
+
+        $invitation = \App\Models\Invitation::where('slug', $slug)->firstOrFail();
+        return view('invitation', compact('invitation'));
     }
 
     /**

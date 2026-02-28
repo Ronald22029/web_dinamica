@@ -14,24 +14,31 @@ class AuthController extends Controller
 
     // Procesar login
     public function login(Request $request) {
-    $credentials = $request->validate([
-        'email' => ['required', 'email'],
-        'password' => ['required'],
-    ]);
+        $request->validate([
+            'login' => 'required',
+            'password' => 'required',
+        ], [
+            'login.required' => 'El campo usuario o correo es obligatorio.',
+            'password.required' => 'La contraseña es obligatoria.',
+        ]);
 
-    if (Auth::attempt($credentials)) {
-        $request->session()->regenerate();
-        
-        // Si estamos en producción, la raíz '/' es el panel.
-        // En local, el panel está en '/admin'.
-        $host = request()->getHost();
-        $url = ($host === 'admin.eleden.site') ? '/' : '/admin';
-        
-        return redirect($url);
+        $login = $request->input('login');
+        $password = $request->input('password');
+
+        // Intentar primero usando el campo como 'email', luego como 'name'
+        if (Auth::attempt(['email' => $login, 'password' => $password]) || 
+            Auth::attempt(['name' => $login, 'password' => $password])) {
+            
+            $request->session()->regenerate();
+            
+            $host = request()->getHost();
+            $url = ($host === 'admin.eleden.site') ? '/' : '/admin';
+            
+            return redirect($url);
+        }
+
+        return back()->withErrors(['login' => 'Las credenciales proporcionadas son incorrectas.']);
     }
-
-    return back()->withErrors(['email' => 'Credenciales incorrectas']);
-}
 
     // Cerrar sesión
     // Cerrar sesión

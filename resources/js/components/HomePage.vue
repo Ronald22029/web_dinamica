@@ -16,6 +16,7 @@
           <li><a href="/categoria/eventos" :class="{ active: pageData.current_category === 'eventos' }">Eventos</a></li>
           <li><a href="/categoria/tecnologia" :class="{ active: pageData.current_category === 'tecnologia' }">Tecnología</a></li>
           <li><a href="/categoria/portafolio" :class="{ active: pageData.current_category === 'portafolio' }">Portafolio</a></li>
+          <li><a href="/invitaciones" :class="{ active: pageData.current_category === 'invitaciones' }">Invitaciones</a></li>
         </ul>
 
       </div>
@@ -75,12 +76,18 @@
     </header>
 
     <section id="content" class="container content-section">
-      <h2 class="section-heading">{{ pageData.current_category === 'home' ? 'Últimas publicaciones' : 'Artículos de ' + pageData.current_category.charAt(0).toUpperCase() + pageData.current_category.slice(1) }}</h2>
+      <h2 class="section-heading">
+        <span v-if="pageData.current_category === 'home'">Últimas publicaciones</span>
+        <span v-else-if="pageData.current_category === 'invitaciones'">Nuestras Invitaciones</span>
+        <span v-else>Artículos de {{ pageData.current_category.charAt(0).toUpperCase() + pageData.current_category.slice(1) }}</span>
+      </h2>
 
-      <div v-if="pageData.posts.length === 0" class="empty-state">
-        <div class="empty-icon">📭</div>
-        <p>No hay publicaciones recientes en esta sección.</p>
-      </div>
+      <!-- CONTENIDO PARA PUBLICACIONES NORMALES -->
+      <template v-if="pageData.current_category !== 'invitaciones'">
+        <div v-if="pageData.posts && pageData.posts.length === 0" class="empty-state">
+          <div class="empty-icon">📭</div>
+          <p>No hay publicaciones recientes en esta sección.</p>
+        </div>
 
       <div v-else class="grid">
         <article v-for="(post, index) in pageData.posts" :key="post.id" 
@@ -122,6 +129,74 @@
           </div>
         </article>
       </div>
+      </template>
+
+      <!-- CONTENIDO PARA INVITACIONES -->
+      <template v-if="pageData.current_category === 'invitaciones'">
+        <div class="grid invitations-grid">
+          <!-- Boda 1 Template -->
+          <article class="inv-card">
+            <div class="inv-media">
+               <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?auto=format&fit=crop&w=600&q=80" alt="Plantilla Boda Clásica">
+               <div class="inv-overlay"></div>
+            </div>
+            <div class="inv-content">
+              <span class="inv-eyebrow">DISEÑO CLÁSICO</span>
+              <h3 class="inv-title">Marcela & Alejandro</h3>
+              <p class="client-name">Plantilla: Boda Especial (Boda 1)</p>
+              
+              <ul class="inv-features">
+                <li>✨ Diseño Elegante y Atemporal</li>
+                <li>📸 Galería de Fotos Premium</li>
+                <li>📍 Mapa Interactivo</li>
+                <li>⏰ Cuenta Regresiva Activa</li>
+              </ul>
+
+              <div class="inv-footer">
+                <a href="/invitacion/boda1" target="_self" class="btn-preview-elegant">Ver Demostración</a>
+                <button @click="shareDemo('boda1', 'Boda Especial (Boda 1)')" class="btn-share-icon" title="Compartir Plantilla">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </article>
+
+          <!-- Boda 2 Template -->
+          <article class="inv-card">
+            <div class="inv-media">
+               <img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=600&q=80" alt="Plantilla Boda Moderna">
+               <div class="inv-overlay"></div>
+            </div>
+            <div class="inv-content">
+              <span class="inv-eyebrow">DISEÑO MODERNO</span>
+              <h3 class="inv-title">Sofia & Roberto</h3>
+              <p class="client-name">Plantilla: Boda Moderna (Boda 2)</p>
+
+              <ul class="inv-features">
+                <li>✨ Diseño Elegante y Atemporal</li>
+                <li>📸 Galería de Fotos Premium</li>
+                <li>📍 Mapa Interactivo</li>
+                <li>🎵 Música con Control de Volumen</li>
+                <li>⏰ Contador Regresivo Activo</li>
+                <li>📊 Seguimiento de Visitas</li>
+                <li>💬 Confirmación WhatsApp</li>
+              </ul>
+
+              <div class="inv-footer">
+                <a href="/invitacion/boda2" target="_self" class="btn-preview-elegant">Ver Demostración</a>
+                <button @click="shareDemo('boda2', 'Boda Moderna (Boda 2)')" class="btn-share-icon" title="Compartir Plantilla">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </article>
+        </div>
+      </template>
+
     </section>
 
     <footer-section></footer-section>
@@ -144,13 +219,44 @@ let interval = null;
 
 const playVideo = (id) => { playingVideoId.value = id; };
 
+const shareDemo = async (slug, title) => {
+  const url = `${window.location.origin}/invitacion/${slug}`;
+  if (navigator.share) {
+    try {
+      await navigator.share({
+        title: title,
+        text: `Mira esta increíble plantilla para tu evento: ${title}`,
+        url: url,
+      });
+    } catch (error) {
+      console.log('Cancelado o error compartiendo', error);
+    }
+  } else {
+    // Fallback genérico a copiar enlace si Share API no está disponible
+    navigator.clipboard.writeText(url).then(() => {
+      alert('¡Enlace copiado al portapapeles!');
+    });
+  }
+};
+
 const getThumbnail = (post) => {
   if (post.image) return post.image;
   if (post.video_url) {
-    if (post.video_url.includes('youtube.com') || post.video_url.includes('youtu.be')) {
-      const videoId = post.video_url.split('v=')[1] || post.video_url.split('/').pop();
+    const url = post.video_url;
+    if (url.includes('youtube.com') || url.includes('youtu.be')) {
+      let videoId = '';
+      if (url.includes('/shorts/')) {
+        videoId = url.split('/shorts/')[1].split('?')[0];
+      } else {
+        videoId = url.split('v=')[1] || url.split('/').pop();
+      }
       const cleanId = videoId ? videoId.split('&')[0].split('?')[0] : null;
       if (cleanId) return `https://img.youtube.com/vi/${cleanId}/hqdefault.jpg`;
+    }
+    if (url.includes('dai.ly') || url.includes('dailymotion.com')) {
+      const parts = url.split('/');
+      const videoId = parts[parts.length - 1].split('?')[0];
+      if (videoId) return `https://www.dailymotion.com/thumbnail/video/${videoId}`;
     }
     return 'https://ui-avatars.com/api/?name=Play+Video&background=1e293b&color=fff&size=512&font-size=0.33';
   }
@@ -160,14 +266,41 @@ const getThumbnail = (post) => {
 const getEmbedUrl = (url) => {
   if (!url) return '';
   if (url.includes('youtube.com') || url.includes('youtu.be')) {
-    const videoId = url.split('v=')[1] || url.split('/').pop();
+    let videoId = '';
+    if (url.includes('/shorts/')) {
+       videoId = url.split('/shorts/')[1].split('?')[0];
+    } else {
+       videoId = url.split('v=')[1] || url.split('/').pop();
+    }
     const cleanId = videoId ? videoId.split('&')[0].split('?')[0] : '';
     return `https://www.youtube.com/embed/${cleanId}?autoplay=1`;
   }
-  if (url.includes('facebook.com')) {
+  if (url.includes('dai.ly') || url.includes('dailymotion.com')) {
+    const parts = url.split('/');
+    const videoId = parts[parts.length - 1].split('?')[0];
+    return `https://www.dailymotion.com/embed/video/${videoId}?autoplay=1`;
+  }
+  if (url.includes('tiktok.com')) {
+    if (url.includes('/video/')) {
+       const videoId = url.split('/video/')[1].split('?')[0];
+       return `https://www.tiktok.com/embed/v2/${videoId}`;
+    }
+    return url; 
+  }
+  if (url.includes('facebook.com') || url.includes('fb.watch')) {
       return `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(url)}&show_text=0&width=560&autoplay=1`;
   }
   return url;
+};
+
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return new Intl.DateTimeFormat('es-ES', { 
+    day: 'numeric', 
+    month: 'long', 
+    year: 'numeric' 
+  }).format(date);
 };
 
 const handleScroll = () => { isScrolled.value = window.scrollY > 20; };
@@ -198,6 +331,7 @@ onUnmounted(() => {
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;500;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap');
 
 .main-wrapper {
   font-family: 'Plus Jakarta Sans', sans-serif;
@@ -400,6 +534,57 @@ onUnmounted(() => {
 .card-title-link { text-decoration: none; color: inherit; }
 .card-title-link:hover { color: #3b82f6; }
 .category-tag { text-decoration: none; color: inherit; }
+
+/* INVITACIONES SPECIFIC (ELEGANT DESIGN) */
+
+.invitations-grid { grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 50px; }
+.inv-card { 
+  background: #fdfbf7; border-radius: 8px; overflow: hidden; 
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: transform 0.4s ease; 
+  border: 4px solid white; text-align: center; position: relative;
+  transform: translateZ(0); backface-visibility: hidden;
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+  mask-image: radial-gradient(white, black);
+}
+.inv-card:hover { transform: translateY(-10px); box-shadow: 0 15px 40px rgba(186, 150, 106, 0.15); }
+.inv-media { height: 260px; position: relative; overflow: hidden; background: #fdfbf7; }
+.inv-media img { width: 102%; height: 102%; margin: -1%; object-fit: cover; transition: transform 0.8s cubic-bezier(0.25, 1, 0.5, 1); will-change: transform; transform: translateZ(0) scale(1); backface-visibility: hidden; }
+.inv-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, transparent, rgba(253, 251, 247, 1)); pointer-events: none; }
+.inv-card:hover .inv-media img { transform: translateZ(0) scale(1.05); }
+
+.inv-content { padding: 0 30px 40px; position: relative; z-index: 2; margin-top: -30px; }
+.inv-eyebrow { font-size: 0.75rem; letter-spacing: 3px; color: #ba966a; display: block; margin-bottom: 5px; text-transform: uppercase; font-weight: bold; }
+.inv-title { font-family: 'Cormorant Garamond', serif; font-size: 2rem; color: #1e293b; margin: 0 0 15px 0; font-weight: 600; line-height: 1.1; }
+.client-name { color: #64748b; font-size: 0.9rem; margin-bottom: 5px; }
+.event-date { color: #94a3b8; font-size: 0.85rem; font-style: italic; font-family: 'Cormorant Garamond', serif; margin-bottom: 25px; }
+
+.inv-features { 
+  list-style: none; padding: 0; margin: 0 0 25px 0; 
+  display: flex; flex-direction: column; gap: 8px;
+  text-align: left;
+}
+.inv-features li { 
+  font-size: 0.85rem; color: #475569; 
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 10px; background: rgba(186, 150, 106, 0.05);
+  border-radius: 6px;
+}
+
+.inv-footer { margin-top: 10px; display: flex; gap: 10px; justify-content: center; align-items: center; }
+.btn-preview-elegant { 
+  display: inline-block; background: transparent; color: #ba966a; 
+  padding: 10px 25px; border-radius: 30px; text-decoration: none; 
+  font-weight: 600; font-size: 0.85rem; transition: 0.3s; 
+  border: 1px solid #ba966a; text-transform: uppercase; letter-spacing: 1px;
+}
+.btn-preview-elegant:hover { background: #ba966a; color: white; transform: translateY(-2px); }
+
+.btn-share-icon {
+  background: transparent; color: #ba966a; border: 1px solid #ba966a; width: 40px; height: 40px;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.3s;
+}
+.btn-share-icon:hover { background: #ba966a; color: white; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(186, 150, 106, 0.2); }
+.text-muted { color: #94a3b8; font-size: 0.85rem; font-style: italic; }
 
 @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
