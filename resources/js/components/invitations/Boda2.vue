@@ -71,7 +71,7 @@
                 <input type="range" v-model="volume" min="0" max="1" step="0.1" @input="updateVolume" class="volume-slider">
                 <span class="vol-icon">🔊</span>
             </div>
-            <audio v-if="musicUrl" ref="audioRef" :src="musicUrl" loop autoplay playsinline
+            <audio ref="audioRef" v-if="musicUrl" :src="musicUrl" loop playsinline
               @timeupdate="onTimeUpdate" @loadedmetadata="onMetadata"
             ></audio>
         </div>
@@ -516,19 +516,24 @@ const sendRSVP = async () => {
 
 const tryAutoplay = () => {
   if (audioRef.value && musicUrl.value) {
-    audioRef.value.play().then(() => {
-      isPlaying.value = true;
-    }).catch(e => {
-        console.log('Autoplay blocked. Waiting for interaction.');
+    let playPromise = audioRef.value.play();
+    
+    if (playPromise !== undefined) {
+      playPromise.then(() => {
+        isPlaying.value = true;
+      }).catch(e => {
+        console.log('Autoplay bloqueado. Esperando interacción del usuario.');
         isPlaying.value = false;
         
-        // Add listeners for any interaction to trigger play
         const playOnInteraction = () => {
           if (audioRef.value) {
-            audioRef.value.play().then(() => {
-              isPlaying.value = true;
-              removeListeners();
-            });
+            let p = audioRef.value.play();
+            if (p !== undefined) {
+              p.then(() => {
+                isPlaying.value = true;
+                removeListeners(); 
+              }).catch(err => console.log('Esperando...', err));
+            }
           }
         };
         
@@ -541,7 +546,8 @@ const tryAutoplay = () => {
         window.addEventListener('click', playOnInteraction);
         window.addEventListener('scroll', playOnInteraction);
         window.addEventListener('touchstart', playOnInteraction);
-    });
+      });
+    }
   }
 };
 
@@ -571,12 +577,6 @@ onMounted(() => {
     });
   }, 500);
 
-  // Intentar play (muchos navegadores lo bloquean hasta interaccion)
-  setTimeout(() => {
-    if (musicUrl.value && audioRef.value) {
-      audioRef.value.play().then(() => isPlaying.value = true).catch(() => {});
-    }
-  }, 1000);
 });
 </script>
 
