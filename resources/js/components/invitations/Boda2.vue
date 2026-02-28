@@ -71,7 +71,7 @@
                 <input type="range" v-model="volume" min="0" max="1" step="0.1" @input="updateVolume" class="volume-slider">
                 <span class="vol-icon">🔊</span>
             </div>
-            <audio ref="audioRef" :src="musicUrl" loop autoplay playsinline
+            <audio v-if="musicUrl" ref="audioRef" :src="musicUrl" loop autoplay playsinline
               @timeupdate="onTimeUpdate" @loadedmetadata="onMetadata"
             ></audio>
         </div>
