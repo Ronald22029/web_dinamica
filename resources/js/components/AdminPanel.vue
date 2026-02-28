@@ -873,9 +873,11 @@ const getTemplateName = (templateCode) => {
 
 const copyLink = (slug) => {
   if (!slug) return showToast('No hay URL configurada', 'error');
-  const path = `${window.location.origin}/invitacion/${slug}`;
+  const path = `${homeUrl.replace(/\/$/, '')}/invitacion/${slug}`;
   navigator.clipboard.writeText(path).then(() => {
     showToast('Enlace de invitación copiado al portapapeles', 'success');
+  }).catch(() => {
+    showToast('Error al copiar el enlace', 'error');
   });
 };
 
