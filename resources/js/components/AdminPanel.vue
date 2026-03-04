@@ -89,6 +89,7 @@
                   <select v-model="newInv.template" class="input" :disabled="!isAdmin">
                     <option value="boda1">💍 Boda Especial (Boda 1)</option>
                     <option value="boda2">🌙 Boda Moderna (Boda 2)</option>
+                    <option value="boda3premium">✨ Boda Premium (Boda 3 Premium)</option>
                     <option value="custom">✨ Personalizada</option>
                   </select>
                   <small v-if="!isAdmin" style="font-size:0.78rem;color:#94a3b8;">La plantilla es asignada por el administrador.</small>
@@ -112,7 +113,7 @@
           </div>
 
           <!-- SECCIÓN B: Constructor de Boda -->
-          <div v-if="newInv.template === 'boda1' || newInv.template === 'boda2'" class="boda-builder">
+          <div v-if="newInv.template === 'boda1' || newInv.template === 'boda2' || newInv.template === 'boda3premium'" class="boda-builder">
 
             <!-- B1: Tema y Color -->
             <div class="form-section">
@@ -299,7 +300,7 @@
                 </div>
 
                 <!-- Música solo disponible en Boda 2 -->
-                <div v-if="newInv.template === 'boda2'" class="mt-3">
+                <div v-if="newInv.template === 'boda2' || newInv.template === 'boda3premium'" class="mt-3">
                   <label class="flabel">🎵 Música de Fondo (MP3)</label>
                   <div v-if="isEditingInv && newInv.music_url && !newInv.music_file" class="music-saved-state">
                     <div class="music-saved-info">
@@ -867,6 +868,7 @@ const clientInvitations = computed(() => {
 const getTemplateName = (templateCode) => {
   if (templateCode === 'boda1') return 'Boda Especial (Boda 1)';
   if (templateCode === 'boda2') return 'Boda Moderna (Boda 2)';
+  if (templateCode === 'boda3premium') return 'Boda Premium (Boda 3 Premium)';
   if (templateCode === 'custom') return 'Personalizada';
   return templateCode || 'Estándar';
 };

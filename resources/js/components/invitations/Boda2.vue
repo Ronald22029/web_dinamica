@@ -195,7 +195,7 @@
             <div class="map-embed-wrapper">
               <iframe
                 :src="mapModal.embedUrl"
-                width="100%" height="380"
+                width="100%" height="100%"
                 frameborder="0" style="border:0;display:block"
                 allowfullscreen loading="lazy"
                 referrerpolicy="no-referrer-when-downgrade"
@@ -1192,13 +1192,24 @@ h1, h2, h3, .names {
 }
 
 @media (max-width: 768px) {
-  .names { font-size: 15vw; margin-bottom: 10px; }
+  .names { font-size: 11vw; margin-bottom: 10px; }
   .date-wrapper { padding: 10px 20px; gap: 10px; margin-top: 25px; }
   .date-line { width: 20px; }
   .date { font-size: 1.2rem; letter-spacing: 2px; }
   .countdown { flex-wrap: wrap; }
-  .time-box { min-width: 70px; padding: 15px 5px; }
-  .section-title { font-size: 2.8rem; }
+  .time-box { flex: 1 1 40%; min-width: 70px; padding: 15px 5px; }
+  .section-title { font-size: 2.5rem; margin-bottom: 30px; }
+  .section { padding: 60px 0; }
+  .grid-2 { grid-template-columns: 1fr; gap: 20px; }
+  .photo-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+  .padrinos-grid { gap: 15px; }
+  .padrino-card { padding: 25px 20px; }
+  .rsvp-form-card { padding: 25px 20px; }
+  .timeline-item { padding-left: 50px; margin-bottom: 30px; }
+  .map-embed-wrapper { height: 300px; }
+  .modern-music-bar { flex-direction: column; padding: 20px 15px; }
+  .music-progress-row { width: 100%; margin-bottom: 15px; }
+  .music-controls { width: 100%; justify-content: space-between; }
 }
 
 /* MUSIC PROGRESS BAR */

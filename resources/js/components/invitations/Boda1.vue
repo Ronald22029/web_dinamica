@@ -1192,12 +1192,20 @@ h1, h2, h3, .names {
 }
 
 @media (max-width: 768px) {
-  .names { font-size: 15vw; margin-bottom: 10px; }
+  .names { font-size: 11vw; margin-bottom: 10px; }
   .date-wrapper { padding: 10px 20px; gap: 10px; margin-top: 25px; }
   .date-line { width: 20px; }
   .date { font-size: 1.2rem; letter-spacing: 2px; }
   .countdown { flex-wrap: wrap; }
-  .time-box { min-width: 70px; padding: 15px 5px; }
-  .section-title { font-size: 2.8rem; }
+  .time-box { flex: 1 1 40%; min-width: 70px; padding: 15px 5px; }
+  .section-title { font-size: 2.5rem; margin-bottom: 30px; }
+  .section { padding: 60px 0; }
+  .grid-2 { grid-template-columns: 1fr; gap: 20px; }
+  .photo-grid { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+  .padrinos-grid { gap: 15px; }
+  .padrino-card { padding: 25px 20px; }
+  .rsvp-form-card { padding: 25px 20px; }
+  .timeline-item { padding-left: 50px; margin-bottom: 30px; }
+  .map-embed-container { height: 300px; }
 }
 </style>

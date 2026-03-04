@@ -6,6 +6,7 @@ import PostPage from './components/PostPage.vue';
 import FooterSection from './components/FooterSection.vue';
 import Boda1 from './components/invitations/Boda1.vue';
 import Boda2 from './components/invitations/Boda2.vue';
+import Boda3Premium from './components/invitations/Boda3Premium.vue';
 
 const app = createApp({});
 
@@ -15,5 +16,6 @@ app.component('post-page', PostPage);
 app.component('footer-section', FooterSection);
 app.component('boda-1', Boda1);
 app.component('boda-2', Boda2);
+app.component('boda-3-premium', Boda3Premium);
 
 app.mount('#app');

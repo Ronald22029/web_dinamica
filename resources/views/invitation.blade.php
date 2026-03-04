@@ -27,6 +27,8 @@
             <boda-1 :invitation='@json($invitation)'></boda-1>
         @elseif($invitation->template === 'boda2')
             <boda-2 :invitation='@json($invitation)'></boda-2>
+        @elseif($invitation->template === 'boda3premium')
+            <boda-3-premium :invitation='@json($invitation)'></boda-3-premium>
         @else
             <!-- Fallback -->
             <boda-1 :invitation='@json($invitation)'></boda-1>

@@ -229,6 +229,40 @@ class HomeController extends Controller
             return view('invitation', compact('invitation'));
         }
 
+        if ($slug === 'boda3premium') {
+            $invitation = new \App\Models\Invitation([
+                'title' => 'Boda Premium (Demo)',
+                'slug' => 'boda3premium',
+                'template' => 'boda3premium',
+                'client_name' => 'Valentina & Mateo',
+                'event_date' => date('Y-m-d', strtotime('+60 days')),
+                'data' => [
+                    'bride' => 'Valentina',
+                    'groom' => 'Mateo',
+                    'ceremony_time' => '17:30',
+                    'ceremony_location' => 'Jardín Exclusivo',
+                    'reception_time' => '20:00',
+                    'reception_location' => 'Salón Vista Bella Premium',
+                    'theme_color' => '#c9a84c',
+                    'music_url' => '/audio/Boda2.mp3',
+                    'whatsapp_rsvp' => '59178945612',
+                    'itinerary' => [
+                        ['time' => '17:30', 'activity' => 'Bienvenida', 'description' => 'Cóctel de entrada.'],
+                        ['time' => '18:30', 'activity' => 'Intercambio de Votos', 'description' => 'Bajo el atardecer.'],
+                        ['time' => '21:00', 'activity' => 'Fiesta Moderna', 'description' => 'DJ y mucha diversión.']
+                    ],
+                    'padrinos' => [
+                        ['role' => 'Padrinos de Honor', 'name' => 'Dr. Fernando & Elena'],
+                    ]
+                ],
+                'gallery_images' => [
+                    'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80',
+                    'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&w=800&q=80'
+                ]
+            ]);
+            return view('invitation', compact('invitation'));
+        }
+
         $invitation = \App\Models\Invitation::where('slug', $slug)->firstOrFail();
         return view('invitation', compact('invitation'));
     }

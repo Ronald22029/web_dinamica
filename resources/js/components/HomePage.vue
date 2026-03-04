@@ -11,7 +11,13 @@
           <span>EL<span class="highlight">.EDEN</span></span>
         </a>
 
-        <ul class="nav-links">
+        <div class="menu-toggle" @click="toggleMenu">
+          <span :class="{ 'open': isMenuOpen }"></span>
+          <span :class="{ 'open': isMenuOpen }"></span>
+          <span :class="{ 'open': isMenuOpen }"></span>
+        </div>
+
+        <ul class="nav-links" :class="{ 'mobile-open': isMenuOpen }">
           <li><a href="/" :class="{ active: pageData.current_category === 'home' }">Inicio</a></li>
           <li><a href="/categoria/eventos" :class="{ active: pageData.current_category === 'eventos' }">Eventos</a></li>
           <li><a href="/categoria/tecnologia" :class="{ active: pageData.current_category === 'tecnologia' }">Tecnología</a></li>
@@ -194,6 +200,38 @@
               </div>
             </div>
           </article>
+
+          <!-- Boda 2 Premium Template -->
+          <article class="inv-card">
+            <div class="inv-media">
+               <img src="https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=600&q=80" alt="Plantilla Boda Premium">
+               <div class="inv-overlay"></div>
+            </div>
+            <div class="inv-content">
+              <span class="inv-eyebrow">DISEÑO PREMIUM</span>
+              <h3 class="inv-title">Valentina & Mateo</h3>
+              <p class="client-name">Plantilla: Boda Premium (Boda 3 Premium)</p>
+
+              <ul class="inv-features" style="opacity:0.9">
+                <li>✨ Experiencia Inmersiva (Lluvia de Corazones)</li>
+                <li>📸 Galería y Efecto Parallax en Secciones</li>
+                <li>📍 Mapa Interactivo</li>
+                <li>🎵 Reproductor de Música Premium</li>
+                <li>⏰ Contador Regresivo Interactivo</li>
+                <li>💬 Confirmación (RSVP Modal) Avanzado</li>
+              </ul>
+
+              <div class="inv-footer">
+                <a href="/invitacion/boda3premium" target="_self" class="btn-preview-elegant">Ver Demostración</a>
+                <button @click="shareDemo('boda3premium', 'Boda Premium (Boda 3 Premium)')" class="btn-share-icon" title="Compartir Plantilla">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </article>
+
         </div>
       </template>
 
@@ -215,9 +253,11 @@ const pageData = ref(props.initialData);
 const isScrolled = ref(false);
 const currentSlide = ref(0);
 const playingVideoId = ref(null);
+const isMenuOpen = ref(false);
 let interval = null;
 
 const playVideo = (id) => { playingVideoId.value = id; };
+const toggleMenu = () => { isMenuOpen.value = !isMenuOpen.value; };
 
 const shareDemo = async (slug, title) => {
   const url = `${window.location.origin}/invitacion/${slug}`;
@@ -399,6 +439,25 @@ onUnmounted(() => {
   background: #3b82f6; transition: width 0.3s ease;
 }
 .nav-links a.active::after { width: 100%; }
+
+/* HAMBURGER MENU */
+.menu-toggle {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  z-index: 1001;
+}
+.menu-toggle span {
+  width: 25px;
+  height: 3px;
+  background-color: #0f172a;
+  border-radius: 3px;
+  transition: all 0.3s;
+}
+.menu-toggle span.open:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+.menu-toggle span.open:nth-child(2) { opacity: 0; }
+.menu-toggle span.open:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
 
 /* HERO */
 .hero-section {
@@ -592,6 +651,25 @@ onUnmounted(() => {
 @media (max-width: 768px) {
   .hero-title { font-size: 2.5rem; }
   .grid { grid-template-columns: 1fr; }
-  .nav-links { display: none; }
+  .menu-toggle { display: flex; }
+  .nav-links {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(12px);
+    flex-direction: column;
+    padding: 30px 0;
+    gap: 25px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+    transition: clip-path 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+  }
+  .nav-links.mobile-open {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  }
 }
 </style>
